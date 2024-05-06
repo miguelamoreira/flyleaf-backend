@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Utilizador = sequelize.define("Utilizador", {
+    const Utilizador = sequelize.define("utilizador", {
         idUtilizador: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         idTipoUtilizador: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            defaultValue: 1,
             validate: {
                 notNull: { msg: "User type ID cannot be empty or null!" }
             }
@@ -47,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
+        tableName: 'utilizador',
         timestamps: false
     });
 

@@ -6,18 +6,10 @@ const { Op, ValidationError } = require('sequelize');
 
 // Display list of all users
 exports.findAll = async (req, res) => {
-    let { nomeUtilizador } = req.query;
-
-    const condition = nomeUtilizador ? { nomeUtilizador: { [Op.like]: `${nomeUtilizador}%`}} : null;
-
     try {   
-        let users = await Utilizador.findAll({
-            where: condition,
-            raw: true
-        })
+        let users = await Utilizador.findAll({ raw: true });
 
         users.forEach(user => {
-            // Add links for each user
             user.links = [
                 { rel: 'self', href: `/users/${user.id}`, method: 'GET'},
                 { rel: 'delete', href: `/users/${user.id}`, method: 'DELETE'},
@@ -26,7 +18,6 @@ exports.findAll = async (req, res) => {
         })
 
         return res.status(200).json({
-            sucess: true,
             data: users,
             links: [
                 { rel: 'add-user', href: '/users', method: 'POST' }
@@ -35,7 +26,7 @@ exports.findAll = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({
-            success: false, msg: err.message || "Some error occurred while retrieving the users."
+            msg: err.message || "Some error occurred while retrieving the users."
         })
     }
 };
@@ -43,106 +34,129 @@ exports.findAll = async (req, res) => {
 // Handle user creation
 exports.create = async (req, res) => {
     try {
-        // Save user in the database
+        const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } });
+        
+        if (existingUser) {
+            return res.status(400).json({ msg: 'User already registed' });
+        }
+
         let newUser = await Utilizador.create(req.body);
 
-        // Return success message with ID
         res.status(201).json({
-            success: true,
             msg: "User successfully created.",
+            data: newUser,
             links: [
-                { rel: "self", href: `/users/${newUser.id}`, method: "GET" },
-                { rel: "delete", href: `/users/${newUser.id}`, method: "DELETE" },
-                { rel: "modify", href: `/users/${newUser.id}`, method: "PUT" },
+                { rel: "self", href: `/users/${newUser.idUtilizador}`, method: "GET" },
+                { rel: "delete", href: `/users/${newUser.idUtilizador}`, method: "DELETE" },
+                { rel: "modify", href: `/users/${newUser.idUtilizador}`, method: "PUT" },
             ]
         });
 
     } catch (err) {
-        if (err instanceof ValidationError)
-            res.status(400).json({ success: false, msg: err.errors.map(e => e.message) });
-        else
+        if (err instanceof ValidationError) {
+            res.status(400).json({ msg: err.errors.map(e => e.message) });
+        } else {
             res.status(500).json({
-                success: false, msg: err.message || "Some error occurred while creating the user."
+                msg: err.message || "Something went wrong. Please try again later."
             });
-    };
+        }
+    }
 };
 
 // Retrieve a single user
 exports.findOne = async (req, res) => {
     try {
-        let user = await Utilizador.findByPk(req.params.idUser);
+        let user = await Utilizador.findByPk(req.params.userId);
 
-        if (!user) 
+        if (!user) {
             return res.status(404).json({
-                success: false,
-                msg: `Cannot find any user with ID ${req.params.idUser}`
+                msg: `Cannot find any user with ID ${req.params.userId}`
             });
+        }
 
         return res.status(200).json({
-            success: true,
             data: user,
             links: [
-                { rel: 'delete', href: `/users/${user.id}`, method: 'DELETE' },
-                { rel: 'update', href: `/users/${user.id}`, method: 'PUT' },
+                { rel: 'delete', href: `/users/${user.idUtilizador}`, method: 'DELETE' },
+                { rel: 'update', href: `/users/${user.idUtilizador}`, method: 'PUT' },
             ]
         });
 
     } catch (err) {
         res.status(500).json({
-            success: false, msg: `Error retrieving user with ID ${req.params.idUser}.`
+            msg: `Something went wrong. Please try again later`
         });
-    };
-};
-
-// Update a user
-exports.update = async (req, res) => {
-    try {
-        let user = await Utilizador.findByPk(req.params.idUser);
-        
-        if (!user) 
-            return res.status(404).json({
-                success: false, 
-                msg: `Cannot find any user with ID ${req.params.idUser}`
-            });
-
-        await Utilizador.update(req.body, {
-            where: { id: req.params.idUser }
-        });
-
-        return res.json({
-            success: true,
-            msg: `User with ID ${req.params.idUser} was updated successfully.`
-        });
-
-    } catch (err) {
-        if (err instanceof ValidationError)
-            res.status(400).json({ success: false, msg: err.errors.map(e => e.message) });
-        else
-            res.status(500).json({
-                success: false, msg: err.message || "Some error occurred while updating the user."
-            });
-    };
+    }
 };
 
 // Delete a user
 exports.delete = async (req, res) => {
     try {
-        let result = await Utilizador.destroy({where: {id: req.params.idUser}});
+        let result = await Utilizador.destroy({ where: { idUtilizador: req.params.userId } });
         
         if (result === 1) 
             return res.status(200).json({
-                success: true,
-                msg: `User with ID ${req.params.idUser} was successfully deleted!`
+                msg: `User with ID ${req.params.userId} was successfully deleted!`
             });
 
         return res.status(404).json({
-            success: false,
-            msg: `Cannot find any user with ID ${req.params.idUser}.`
+            msg: `Cannot find any user with ID ${req.params.userId}.`
         });
 
     } catch (err) {
         res.status(500).json({
-            success: false, msg: `Error deleting user with ID ${req.params.idUser}.`
+            msg: `Something went wrong. Please try again later`
         });
-    };
+    }
+};
+
+// Toggle user state
+exports.toggleState = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                msg: `Cannot find any user with ID ${req.params.userId}`
+            });
+        }
+
+        user.estadoUtilizador = user.estadoUtilizador === 'normal' ? 'bloqueado' : 'normal';
+
+        await user.save();
+
+        return res.status(200).json({
+            msg: `EstadoUtilizador for user with ID ${req.params.userId} successfully toggled!`,
+            data: user
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: `Something went wrong. Please try again later`
+        });
+    }
+};
+
+// Update user's data
+exports.update = async (req, res) => {
+    try {
+        const { username, email, password, confirmPassword } = req.body;
+
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: `User with ID ${req.params.userId} not found.` });
+        }
+
+        user.username = username;
+        user.email = email;
+
+        if (password && confirmPassword && password === confirmPassword) {
+            user.password = password;
+        }
+
+        await user.save();
+
+        return res.status(200).json({ msg: `User with ID ${req.params.userId} updated successfully.` });
+    } catch (err) {
+        return res.status(500).json({ msg: err.message || "Something went wrong. Please try again later" });
+    }
 };
