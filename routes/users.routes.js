@@ -3,6 +3,9 @@ const router = express.Router();
 const userController = require("../controllers/users.controller.js");
 
 // USERS
+router.route('/login')
+    .post(userController.login)
+    
 router.route('/')
     .get(userController.findAll)
     .post(userController.create);
