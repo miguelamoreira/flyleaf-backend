@@ -37,6 +37,27 @@ db.tipoNotificacao = require("./notificationTypes.model.js")(sequelize, DataType
 db.listaLeitura = require("./readingLists.model.js")(sequelize, DataTypes);
 db.tipoUtilizador = require("./userTypes.model.js")(sequelize, DataTypes);
 
+// Associations
+db.tipoUtilizador.hasMany(db.utilizador, { foreignKey: 'idTipoUtilizador' })
+db.utilizador.belongsTo(db.tipoUtilizador, { foreignKey: 'idTipoUtilizador' });
+
+db.utilizador.hasMany(db.criticaLivro, { foreignKey: 'idUtilizador' });
+db.criticaLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
+db.livro.hasMany(db.criticaLivro, { foreignKey: 'idLivro' });
+db.criticaLivro.belongsTo(db.livro, { foreignKey: 'idLivro' });
+
+db.utilizador.hasMany(db.pedidoNovoLivro, { foreignKey: 'idUtilizador' });
+db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
+db.utilizador.hasMany(db.listaLeitura, { foreignKey: 'idUtilizador' });
+db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
+db.utilizador.hasMany(db.notificacao, { foreignKey: 'idUtilizador' });
+db.notificacao.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
+db.tipoNotificacao.hasMany(db.notificacao, { foreignKey: 'idTipoNotificacao' });
+db.notificacao.belongsTo(db.tipoNotificacao, { foreignKey: 'idTipoNotificacao' });
 
 
 module.exports = db;
