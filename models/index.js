@@ -81,7 +81,7 @@ db.pedidoNovoLivro.belongsTo(db.utilizador);
 db.tipoNotificacao.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.tipoNotificacao);
 
-db.tipoUtilizador.hasMany(db.utilizador);
-db.utilizador.belongsTo(db.tipoUtilizador);
+//db.tipoUtilizador.hasMany(db.utilizador);
+//db.utilizador.belongsTo(db.tipoUtilizador);
 
 module.exports = db;

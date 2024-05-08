@@ -26,11 +26,11 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ userId: user.idUtilizador }, 'secret', { expiresIn: '1h' });
     
-        res.status(200).json({ token });
+        res.status(200).json({ token, userType: user.idTipoUtilizador });
     } catch (error) {
         res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
-  };
+};
 
 // Display list of all users
 exports.findAll = async (req, res) => {
