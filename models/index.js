@@ -27,6 +27,16 @@ const db = {};
 db.sequelize = sequelize;
 
 db.utilizador = require("./users.model.js")(sequelize, DataTypes);
+db.autor = require("./authors.model.js")(sequelize, DataTypes);
+db.pedidoNovoLivro = require("./bookRequests.model.js")(sequelize, DataTypes);
+db.criticaLivro = require("./bookReviews.model.js")(sequelize, DataTypes);
+db.livro = require("./books.model.js")(sequelize, DataTypes);
+db.categoria = require("./genres.model.js")(sequelize, DataTypes);
+db.notificacao = require("./notifications.model.js")(sequelize, DataTypes);
+db.tipoNotificacao = require("./notificationTypes.model.js")(sequelize, DataTypes);
+db.listaLeitura = require("./readingLists.model.js")(sequelize, DataTypes);
+db.tipoUtilizador = require("./userTypes.model.js")(sequelize, DataTypes);
+
 
 
 module.exports = db;

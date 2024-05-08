@@ -1,0 +1,51 @@
+module.exports = (sequelize, DataTypes) => {
+    const pedidoNovoLivro = sequelize.define("pedidoNovoLivro", {
+        idPedidoLivro: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        nomePedidoLivro: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Book request name cannot be empty or null!" }
+            }
+        },
+        anoPedidoLivro: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: true,
+            validate: {
+                notNull: { msg: "Book request year cannot be empty or null!" }
+            }
+        },
+        descPedidoLivro: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Book request description cannot be empty or null!" }
+            }
+        },
+        capaPedidoLivro: {
+            type: DataTypes.BLOB,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Book request cover cannot be empty or null!" }
+            }
+        },
+        estadoPedido: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'validating',
+            validate: {
+                notNull: { msg: "Book request state cannot be empty or null!" }
+            }
+        },
+    }, {
+        tableName: 'pedidoNovoLivro',
+        timestamps: false
+    });
+
+    return pedidoNovoLivro;
+};
