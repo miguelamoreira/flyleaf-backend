@@ -35,8 +35,53 @@ db.categoria = require("./genres.model.js")(sequelize, DataTypes);
 db.notificacao = require("./notifications.model.js")(sequelize, DataTypes);
 db.tipoNotificacao = require("./notificationTypes.model.js")(sequelize, DataTypes);
 db.listaLeitura = require("./readingLists.model.js")(sequelize, DataTypes);
+db.leitura = require("./readings.model.js")(sequelize, DataTypes);
+db.configNotifUtilizador = require("./userNotifConfigs.model.js")(sequelize, DataTypes);
 db.tipoUtilizador = require("./userTypes.model.js")(sequelize, DataTypes);
 
+db.autor.belongsToMany(db.livro, { through: 'autorlivro' });
+db.livro.belongsToMany(db.autor, { through: 'autorlivro' });
 
+db.categoria.belongsToMany(db.livro, { through: 'categorialivro' });
+db.livro.belongsToMany(db.categoria, { through: 'categorialivro' });
+
+db.autor.belongsToMany(db.pedidoNovoLivro, { through: 'autorpedido' });
+db.pedidoNovoLivro.belongsToMany(db.autor, { through: 'autorpedido' });
+
+db.categoria.belongsToMany(db.pedidoNovoLivro, { through: 'categoriapedido' });
+db.pedidoNovoLivro.belongsToMany(db.categoria, { through: 'categoriapedido' });
+
+db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
+db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });
+
+db.listaLeitura.belongsToMany(db.livro, { through: 'livrolista' });
+db.livro.belongsToMany(db.listaLeitura, { through: 'livrolista' });
+
+db.utilizador.belongsToMany(db.livro, { through: db.leitura });
+db.livro.belongsToMany(db.utilizador, { through: db.leitura });
+
+db.utilizador.belongsToMany(db.tipoNotificacao, { through: db.configNotifUtilizador });
+db.tipoNotificacao.belongsToMany(db.utilizador, { through: db.configNotifUtilizador });
+
+db.livro.hasMany(db.criticaLivro);
+db.criticaLivro.belongsTo(db.livro);
+
+db.utilizador.hasMany(db.criticaLivro);
+db.criticaLivro.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.listaLeitura);
+db.listaLeitura.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.notificacao);
+db.notificacao.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.pedidoNovoLivro);
+db.pedidoNovoLivro.belongsTo(db.utilizador);
+
+db.tipoNotificacao.hasMany(db.notificacao);
+db.notificacao.belongsTo(db.tipoNotificacao);
+
+db.tipoUtilizador.hasMany(db.utilizador);
+db.utilizador.belongsTo(db.tipoUtilizador);
 
 module.exports = db;

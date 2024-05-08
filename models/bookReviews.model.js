@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const criticaLivro = sequelize.define("criticaLivro", {
+    const criticaLivro = sequelize.define("criticalivro", {
         idCritica: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'criticaLivro',
+        tableName: 'criticalivro',
         timestamps: false
     });
 
