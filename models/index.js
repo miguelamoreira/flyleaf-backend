@@ -35,29 +35,53 @@ db.categoria = require("./genres.model.js")(sequelize, DataTypes);
 db.notificacao = require("./notifications.model.js")(sequelize, DataTypes);
 db.tipoNotificacao = require("./notificationTypes.model.js")(sequelize, DataTypes);
 db.listaLeitura = require("./readingLists.model.js")(sequelize, DataTypes);
+db.leitura = require("./readings.model.js")(sequelize, DataTypes);
+db.configNotifUtilizador = require("./userNotifConfigs.model.js")(sequelize, DataTypes);
 db.tipoUtilizador = require("./userTypes.model.js")(sequelize, DataTypes);
 
-// Associations
-db.tipoUtilizador.hasMany(db.utilizador, { foreignKey: 'idTipoUtilizador' })
-db.utilizador.belongsTo(db.tipoUtilizador, { foreignKey: 'idTipoUtilizador' });
+db.autor.belongsToMany(db.livro, { through: 'autorlivro' });
+db.livro.belongsToMany(db.autor, { through: 'autorlivro' });
 
-db.utilizador.hasMany(db.criticaLivro, { foreignKey: 'idUtilizador' });
-db.criticaLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+db.categoria.belongsToMany(db.livro, { through: 'categorialivro' });
+db.livro.belongsToMany(db.categoria, { through: 'categorialivro' });
 
-db.livro.hasMany(db.criticaLivro, { foreignKey: 'idLivro' });
-db.criticaLivro.belongsTo(db.livro, { foreignKey: 'idLivro' });
+db.autor.belongsToMany(db.pedidoNovoLivro, { through: 'autorpedido' });
+db.pedidoNovoLivro.belongsToMany(db.autor, { through: 'autorpedido' });
 
-db.utilizador.hasMany(db.pedidoNovoLivro, { foreignKey: 'idUtilizador' });
-db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+db.categoria.belongsToMany(db.pedidoNovoLivro, { through: 'categoriapedido' });
+db.pedidoNovoLivro.belongsToMany(db.categoria, { through: 'categoriapedido' });
 
-db.utilizador.hasMany(db.listaLeitura, { foreignKey: 'idUtilizador' });
-db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
+db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });
 
-db.utilizador.hasMany(db.notificacao, { foreignKey: 'idUtilizador' });
-db.notificacao.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+db.listaLeitura.belongsToMany(db.livro, { through: 'livrolista' });
+db.livro.belongsToMany(db.listaLeitura, { through: 'livrolista' });
 
-db.tipoNotificacao.hasMany(db.notificacao, { foreignKey: 'idTipoNotificacao' });
-db.notificacao.belongsTo(db.tipoNotificacao, { foreignKey: 'idTipoNotificacao' });
+db.utilizador.belongsToMany(db.livro, { through: db.leitura });
+db.livro.belongsToMany(db.utilizador, { through: db.leitura });
 
+db.utilizador.belongsToMany(db.tipoNotificacao, { through: db.configNotifUtilizador });
+db.tipoNotificacao.belongsToMany(db.utilizador, { through: db.configNotifUtilizador });
+
+db.livro.hasMany(db.criticaLivro);
+db.criticaLivro.belongsTo(db.livro);
+
+db.utilizador.hasMany(db.criticaLivro);
+db.criticaLivro.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.listaLeitura);
+db.listaLeitura.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.notificacao);
+db.notificacao.belongsTo(db.utilizador);
+
+db.utilizador.hasMany(db.pedidoNovoLivro);
+db.pedidoNovoLivro.belongsTo(db.utilizador);
+
+db.tipoNotificacao.hasMany(db.notificacao);
+db.notificacao.belongsTo(db.tipoNotificacao);
+
+db.tipoUtilizador.hasMany(db.utilizador);
+db.utilizador.belongsTo(db.tipoUtilizador);
 
 module.exports = db;

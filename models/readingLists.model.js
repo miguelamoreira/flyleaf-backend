@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const listaLeitura = sequelize.define("listaLeitura", {
+    const listaLeitura = sequelize.define("listaleitura", {
         idLista: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'listaLeitura',
+        tableName: 'listaleitura',
         timestamps: false
     });
 

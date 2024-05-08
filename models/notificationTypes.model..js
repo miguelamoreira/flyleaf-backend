@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'tipoNotificacao',
+        tableName: 'tiponotificacao',
         timestamps: false
     });
 
