@@ -39,11 +39,35 @@ db.leitura = require("./readings.model.js")(sequelize, DataTypes);
 db.configNotifUtilizador = require("./userNotifConfigs.model.js")(sequelize, DataTypes);
 db.tipoUtilizador = require("./userTypes.model.js")(sequelize, DataTypes);
 
-db.autor.belongsToMany(db.livro, { through: 'autorlivro' });
-db.livro.belongsToMany(db.autor, { through: 'autorlivro' });
+db.autor.belongsToMany(db.livro, {
+    through: 'autorlivro',
+    as: 'livros', 
+    foreignKey: 'idAutor', 
+    otherKey: 'idLivro', 
+    timestamps: false
+});
 
-db.categoria.belongsToMany(db.livro, { through: 'categorialivro' });
-db.livro.belongsToMany(db.categoria, { through: 'categorialivro' });
+db.livro.belongsToMany(db.autor, {
+    through: 'autorlivro',
+    as: 'autores', 
+    foreignKey: 'idLivro',
+    otherKey: 'idAutor',
+    timestamps: false
+});
+
+db.categoria.belongsToMany(db.livro, {
+    through: 'categorialivro',
+    timestamps: false,
+    foreignKey: 'idCategoria', 
+    otherKey: 'idLivro' 
+});
+
+db.livro.belongsToMany(db.categoria, {
+    through: 'categorialivro',
+    timestamps: false, 
+    foreignKey: 'idLivro', 
+    otherKey: 'idCategoria' 
+});
 
 db.autor.belongsToMany(db.pedidoNovoLivro, { through: 'autorpedido' });
 db.pedidoNovoLivro.belongsToMany(db.autor, { through: 'autorpedido' });

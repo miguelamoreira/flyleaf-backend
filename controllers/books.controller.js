@@ -17,8 +17,8 @@ exports.findAllBooks = async (req, res) => {
         }
 
         if (autorLivro) {
-            whereOptions['$autor.nomeAutor$'] = { [Op.like]: `%${autorLivro}%` };
-        }
+            whereOptions['$autores.nomeAutor$'] = { [Op.like]: `%${autorLivro}%` };
+        }        
 
         if (categoriaLivro) {
             whereOptions['$categoria.nomeCategoria$'] = { [Op.like]: `%${categoriaLivro}%` };
@@ -28,8 +28,19 @@ exports.findAllBooks = async (req, res) => {
             whereOptions.nomeLivro = { [Op.like]: `%${nomeLivro}%` };
         }
 
+        const isEmpty = Object.keys(whereOptions).length === 0;
+
         books = await Livro.findAll({
-            where: whereOptions,
+            where: isEmpty ? {} : whereOptions,
+            include: [
+                { 
+                    model: Autor, 
+                    as: 'autores', 
+                    attributes: ['nomeAutor'], 
+                    through: { attributes: [] } 
+                }, 
+                { model: Categoria, as: 'categoria', attributes: ['nomeCategoria'] } 
+            ],                      
             raw: true
         });
 
