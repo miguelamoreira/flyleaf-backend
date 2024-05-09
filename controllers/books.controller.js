@@ -30,17 +30,6 @@ exports.findAllBooks = async (req, res) => {
 
         books = await Livro.findAll({
             where: whereOptions,
-            include: [
-                { 
-                    model: Autor,
-                    attributes: ['nomeAutor']
-                },
-                { 
-                    model: Categoria, 
-                    attributes: ['nomeCategoria'], 
-                    through: { attributes: [] } 
-                }
-            ],
             raw: true
         });
 
