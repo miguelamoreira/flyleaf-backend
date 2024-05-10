@@ -105,8 +105,8 @@ db.criticaLivro.belongsTo(db.utilizador);
 db.utilizador.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.utilizador);
 
-db.utilizador.hasMany(db.pedidoNovoLivro);
-db.pedidoNovoLivro.belongsTo(db.utilizador);
+db.utilizador.hasMany(db.pedidoNovoLivro, { foreignKey: 'idUtilizador' });
+db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
 
 db.tipoNotificacao.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.tipoNotificacao);

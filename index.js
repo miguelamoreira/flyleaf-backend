@@ -18,6 +18,7 @@ app.use('/users', require("./routes/users.routes.js"));
 app.use('/books', require("./routes/books.routes.js"));
 app.use('/categories', require("./routes/genres.routes.js"))
 app.use('/reading-lists', require("./routes/lists.routes.js"))
+app.use('/requests', require("./routes/bookRequests.routes.js"))
 
 // handle invalid routes
 app.all('*', function (req, res) {

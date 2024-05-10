@@ -2,29 +2,35 @@ const db = require("../models/index.js");
 const PedidoNovoLivro = db.pedidoNovoLivro;
 const Livro = db.livro;
 
-exports.findUserRequests = async (req, res) => {
-    try {
-        const userId = req.userId;
+exports.findAllRequests = async (req, res) => {
+    try {   
+        let requests = await PedidoNovoLivro.findAll({ raw: true });
 
-        const userRequests = await PedidoNovoLivro.findAll({
-            where: {
-                idUtilizador: userId
-            }
-        });
+        requests.forEach(request => {
+            request.links = [
+                { rel: 'delete', href: `/requests/${request.idPedidoLivro}`, method: 'DELETE'},
+                { rel: 'update', href: `/requests/${request.idPedidoLivro}`, method: 'PATCH'},
+            ]
+        })
 
-        res.status(200).json({
-            msg: "Requests retrieved successfully.",
-            data: userRequests
-        });
-    } catch (error) {
-        res.status(500).json({msg: err.message || "Something went wrong. Please try again later."});
+        return res.status(200).json({
+            data: requests,
+            links: [
+                { rel: 'add-request', href: '/requests', method: 'POST' }
+            ]
+        })
+
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message || "Something went wrong. Please try again later."
+        })
     }
 };
 
-// Controller function to create a new book request associated with the logged-in user
+// Controller function to create a new book request associated with the logged-in request
 exports.createRequest = async (req, res) => {
     try {
-        const userId = req.userId;
+        const requestId = req.requestId;
 
         // Check if the book already exists
         const existingBook = await Livro.findOne({
@@ -39,17 +45,17 @@ exports.createRequest = async (req, res) => {
             return res.status(400).json({ msg: 'Book already registered' });
         }
 
-        // Add user ID to the request body
-        req.body.idUtilizador = userId;
+        // Add request ID to the request body
+        req.body.idPedidoNovoLivro = requestId;
 
-        // Create a new book request associated with the logged-in user
+        // Create a new book request associated with the logged-in request
         let newRequest = await PedidoNovoLivro.create({
             nomePedidoLivro: req.body.nomePedidoLivro,
             anoPedidoLivro: req.body.anoPedidoLivro,
             descricaoPedidoLivro: req.body.descricaoPedidoLivro,
             capaLivroPedido: req.body.capaLivroPedido,
             estadoPedido: 'validating',
-            idUtilizador: userId // Associate request with logged-in user
+            idPedidoNovoLivro: requestId // Associate request with logged-in request
         });
 
         res.status(201).json({
