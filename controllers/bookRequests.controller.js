@@ -105,6 +105,21 @@ exports.updateRequestState = async (req, res) => {
         // Save the updated book request
         await request.save();
 
+        // If the request is accepted, add the book to the Livro model
+        if (requestedState === 'accepted') {
+            const newBook = await Livro.create({
+                nomeLivro: request.nomePedidoLivro,
+                anoPublicacao: request.anoPedidoLivro,
+                descricaoLivro: request.descricaoPedidoLivro,
+                capaLivro: request.capaLivroPedido
+            });
+
+            return res.status(200).json({
+                msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}! Book added to database.`,
+                data: newBook
+            });
+        }
+
         return res.status(200).json({
             msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}!`,
             data: request
