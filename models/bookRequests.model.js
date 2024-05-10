@@ -20,14 +20,14 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: { msg: "Book request year cannot be empty or null!" }
             }
         },
-        descPedidoLivro: {
+        descricaoPedidoLivro: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: { msg: "Book request description cannot be empty or null!" }
             }
         },
-        capaPedidoLivro: {
+        capaLivroPedido: {
             type: DataTypes.BLOB,
             allowNull: false,
             validate: {
@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'pedidonovolivro',
         timestamps: false
     });
+
+    pedidoNovoLivro.associate = (models) => {
+        pedidoNovoLivro.belongsTo(models.utilizador, { foreignKey: 'idUtilizador' });
+    };
 
     return pedidoNovoLivro;
 };

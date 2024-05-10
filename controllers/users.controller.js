@@ -65,7 +65,7 @@ exports.create = async (req, res) => {
         const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } });
         
         if (existingUser) {
-            return res.status(400).json({ msg: 'User already registed' });
+            return res.status(400).json({ msg: 'User already registered' });
         }
 
         let newUser = await Utilizador.create(req.body);
