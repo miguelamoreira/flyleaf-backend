@@ -78,8 +78,17 @@ db.pedidoNovoLivro.belongsToMany(db.categoria, { through: 'categoriapedido' });
 db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
 db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });
 
-db.listaLeitura.belongsToMany(db.livro, { through: 'livrolista' });
-db.livro.belongsToMany(db.listaLeitura, { through: 'livrolista' });
+db.listaLeitura.belongsToMany(db.livro, { 
+    through: 'livrolista', 
+    foreignKey: 'idLista', 
+    timestamps: false 
+});
+
+db.livro.belongsToMany(db.listaLeitura, { 
+    through: 'livrolista', 
+    foreignKey: 'idLivro', 
+    timestamps: false 
+});
 
 db.utilizador.belongsToMany(db.livro, { through: db.leitura });
 db.livro.belongsToMany(db.utilizador, { through: db.leitura });
@@ -93,9 +102,6 @@ db.criticaLivro.belongsTo(db.livro);
 db.utilizador.hasMany(db.criticaLivro);
 db.criticaLivro.belongsTo(db.utilizador);
 
-db.utilizador.hasMany(db.listaLeitura);
-db.listaLeitura.belongsTo(db.utilizador);
-
 db.utilizador.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.utilizador);
 
@@ -104,8 +110,5 @@ db.pedidoNovoLivro.belongsTo(db.utilizador);
 
 db.tipoNotificacao.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.tipoNotificacao);
-
-//db.tipoUtilizador.hasMany(db.utilizador);
-//db.utilizador.belongsTo(db.tipoUtilizador);
 
 module.exports = db;
