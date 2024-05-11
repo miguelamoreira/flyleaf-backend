@@ -101,6 +101,9 @@ db.pedidoNovoLivro.belongsToMany(db.categoria, {
     timestamps: false
 });
 
+db.utilizador.hasMany(db.listaLeitura, { foreignKey: 'idUtilizador' });
+db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
 db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
 db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });
 
