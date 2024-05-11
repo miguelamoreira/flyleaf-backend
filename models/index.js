@@ -69,11 +69,37 @@ db.livro.belongsToMany(db.categoria, {
     otherKey: 'idCategoria' 
 });
 
-db.autor.belongsToMany(db.pedidoNovoLivro, { through: 'autorpedido' });
-db.pedidoNovoLivro.belongsToMany(db.autor, { through: 'autorpedido' });
+db.autor.belongsToMany(db.pedidoNovoLivro, {
+    through: 'autorpedido',
+    as: 'pedidos', 
+    foreignKey: 'idAutor', 
+    otherKey: 'idPedidoLivro', 
+    timestamps: false
+});
 
-db.categoria.belongsToMany(db.pedidoNovoLivro, { through: 'categoriapedido' });
-db.pedidoNovoLivro.belongsToMany(db.categoria, { through: 'categoriapedido' });
+db.pedidoNovoLivro.belongsToMany(db.autor, {
+    through: 'autorpedido',
+    as: 'autores', 
+    foreignKey: 'idPedidoLivro', 
+    otherKey: 'idAutor', 
+    timestamps: false
+});
+
+db.categoria.belongsToMany(db.pedidoNovoLivro, {
+    through: 'categoriapedido',
+    as: 'pedidos',
+    foreignKey: 'idCategoria',
+    otherKey: 'idPedidoLivro', 
+    timestamps: false
+});
+
+db.pedidoNovoLivro.belongsToMany(db.categoria, {
+    through: 'categoriapedido',
+    as: 'categorias',
+    foreignKey: 'idPedidoLivro',
+    otherKey: 'idCategoria',
+    timestamps: false
+});
 
 db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
 db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });

@@ -5,7 +5,7 @@ const authenticate = require('../middlewares/auth.middleware.js');
 
 router.route('/')
     .get(bookRequestsController.findAllRequests)
-    .post(authenticate, bookRequestsController.createRequest)
+    .post(bookRequestsController.createRequest)
 
 router.route('/:requestId')
     .patch(bookRequestsController.updateRequestState)

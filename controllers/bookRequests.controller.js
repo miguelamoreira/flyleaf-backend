@@ -1,24 +1,33 @@
 const db = require("../models/index.js");
+const { ValidationError } = require('sequelize');
 const PedidoNovoLivro = db.pedidoNovoLivro;
 const Livro = db.livro;
+const Autor = db.autor;
+const Categoria = db.categoria;
 
 exports.findAllRequests = async (req, res) => {
     try {   
-        let requests = await PedidoNovoLivro.findAll({ raw: true });
+        let requests = await PedidoNovoLivro.findAll({
+            include: [
+                { model: Autor, as: 'autores' },
+                { model: Categoria, as: 'categorias'}
+            ],
+            raw: true
+        });
 
         requests.forEach(request => {
             request.links = [
                 { rel: 'delete', href: `/requests/${request.idPedidoLivro}`, method: 'DELETE'},
                 { rel: 'update', href: `/requests/${request.idPedidoLivro}`, method: 'PATCH'},
             ]
-        })
+        });
 
         return res.status(200).json({
             data: requests,
             links: [
                 { rel: 'add-request', href: '/requests', method: 'POST' }
             ]
-        })
+        });
 
     } catch (err) {
         res.status(500).json({
@@ -34,10 +43,11 @@ exports.createRequest = async (req, res) => {
 
         // Check if the book already exists
         const existingBook = await Livro.findOne({
-            where: { nomeLivro: req.body.nomePedidoLivro }, // Only check for the book name
+            where: { nomeLivro: req.body.nomePedidoLivro },
             include: [{
                 model: Autor,
-                where: { nomeAutor: req.body.autorPedidoLivro } // Check for the author's name
+                as: 'autores',
+                where: { nomeAutor: req.body.autorPedidoLivro }
             }]
         });
         
@@ -45,17 +55,26 @@ exports.createRequest = async (req, res) => {
             return res.status(400).json({ msg: 'Book already registered' });
         }
 
-        // Add request ID to the request body
+        const author = await Autor.findOne({ where: { nomeAutor: req.body.autorPedidoLivro } });
+        const category = await Categoria.findByPk(req.body.idCategoria);
+
+        const idUtilizador = req.userId; 
+
         req.body.idPedidoNovoLivro = requestId;
 
-        // Create a new book request associated with the logged-in request
+        req.body.idUtilizador = req.body.idUtilizador || idUtilizador;
+        req.body.idTipoUtilizador = req.body.idTipoUtilizador || 1;
+
         let newRequest = await PedidoNovoLivro.create({
             nomePedidoLivro: req.body.nomePedidoLivro,
             anoPedidoLivro: req.body.anoPedidoLivro,
             descricaoPedidoLivro: req.body.descricaoPedidoLivro,
             capaLivroPedido: req.body.capaLivroPedido,
             estadoPedido: 'validating',
-            idPedidoNovoLivro: requestId // Associate request with logged-in request
+            idPedidoNovoLivro: requestId, 
+            idUtilizador: idUtilizador,
+            Autor: author,
+            Categoria: category
         });
 
         res.status(201).json({
@@ -80,8 +99,12 @@ exports.createRequest = async (req, res) => {
 
 exports.updateRequestState = async (req, res) => {
     try {
-        // Find the book request by its ID
-        let request = await PedidoNovoLivro.findByPk(req.params.requestId);
+        let request = await PedidoNovoLivro.findByPk(req.params.requestId, {
+            include: [
+                { model: Autor, as: 'autores' }, 
+                { model: Categoria, as: 'categorias', attributes: ['idCategoria', 'nomeCategoria'] }
+            ]
+        });
 
         if (!request) {
             return res.status(404).json({
@@ -89,7 +112,6 @@ exports.updateRequestState = async (req, res) => {
             });
         }
 
-        // Ensure the requested state is one of the valid options
         const validStates = ['validating', 'accepted', 'denied'];
         const requestedState = req.body.estadoPedido;
 
@@ -99,20 +121,38 @@ exports.updateRequestState = async (req, res) => {
             });
         }
 
-        // Update the state of the book request
         request.estadoPedido = requestedState;
 
-        // Save the updated book request
         await request.save();
 
-        // If the request is accepted, add the book to the Livro model
         if (requestedState === 'accepted') {
+            let author = await Autor.findOne({ where: { nomeAutor: request.autores[0].nomeAutor } });
+
+            if (!author) {
+                author = await Autor.create({ nomeAutor: request.autores[0].nomeAutor });
+            }
+
+            let category = request.categorias[0];
+            if (!category) {
+                return res.status(400).json({
+                    msg: "Category not provided or invalid."
+                });
+            }
+
+            console.log('Category:', category.toJSON());
+
             const newBook = await Livro.create({
                 nomeLivro: request.nomePedidoLivro,
-                anoPublicacao: request.anoPedidoLivro,
-                descricaoLivro: request.descricaoPedidoLivro,
+                anoLivro: request.anoPedidoLivro,
+                descricao: request.descricaoPedidoLivro,
                 capaLivro: request.capaLivroPedido
             });
+
+            console.log('New Book:', newBook.toJSON()); 
+
+            await newBook.setAutor(author);
+
+            await newBook.addCategoria(category);
 
             return res.status(200).json({
                 msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}! Book added to database.`,
@@ -125,6 +165,7 @@ exports.updateRequestState = async (req, res) => {
             data: request
         });
     } catch (err) {
+        console.error(err); 
         res.status(500).json({
             msg: `Something went wrong. Please try again later`
         });

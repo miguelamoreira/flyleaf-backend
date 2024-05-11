@@ -52,5 +52,9 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    Utilizador.associate = (models) => {
+        Utilizador.belongsTo(models.tipoutilizador, { foreignKey: 'idTipoUtilizador' });
+    };
+
     return Utilizador;
 };

@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     tipoUtilizador.associate = (models) => {
-        tipoUtilizador.belongsTo(models.utilizador, { foreignKey: 'idUtilizador' });
+        tipoUtilizador.hasMany(models.utilizador, { foreignKey: 'idUtilizador' });
     };
 
     return tipoUtilizador;
