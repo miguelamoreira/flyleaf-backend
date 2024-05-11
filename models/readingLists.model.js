@@ -30,10 +30,5 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'listaleitura',
         timestamps: false
     });
-
-    listaLeitura.associate = (models) => {
-        listaLeitura.belongsTo(models.utilizador, { foreignKey: 'idUtilizador' });
-    };
-
     return listaLeitura;
 };

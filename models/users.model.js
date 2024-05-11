@@ -35,10 +35,6 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: { msg: "Password cannot be empty or null!" }
             }
         },
-        pontosUtilizador: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0
-        },
         estadoUtilizador: {
             type: DataTypes.STRING,
             allowNull: false,
