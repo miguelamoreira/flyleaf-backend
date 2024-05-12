@@ -4,13 +4,15 @@ const PedidoNovoLivro = db.pedidoNovoLivro;
 const Livro = db.livro;
 const Autor = db.autor;
 const Categoria = db.categoria;
+const Utilizador = db.utilizador;
 
 exports.findAllRequests = async (req, res) => {
     try {   
         let requests = await PedidoNovoLivro.findAll({
             include: [
                 { model: Autor, as: 'autores' },
-                { model: Categoria, as: 'categorias'}
+                { model: Categoria, as: 'categorias'},
+                { model: Utilizador, as: 'utilizador', attributes: ['idUtilizador', 'nomeUtilizador'] }
             ],
             raw: true
         });
@@ -36,64 +38,62 @@ exports.findAllRequests = async (req, res) => {
     }
 };
 
-// Controller function to create a new book request associated with the logged-in request
+// Controller function to create a new book request
 exports.createRequest = async (req, res) => {
     try {
-        const requestId = req.requestId;
+        // Extract request body data
+        const { idUtilizador, bookData, authorNames, categoryIds } = req.body;
 
         // Check if the book already exists
-        const existingBook = await Livro.findOne({
-            where: { nomeLivro: req.body.nomePedidoLivro },
-            include: [{
-                model: Autor,
-                as: 'autores',
-                where: { nomeAutor: req.body.autorPedidoLivro }
-            }]
+        const existingBook = await db.livro.findOne({
+            where: {
+                nomeLivro: bookData.nomePedidoLivro,
+                anoLivro: bookData.anoPedidoLivro
+            }
         });
-        
+
         if (existingBook) {
-            return res.status(400).json({ msg: 'Book already registered' });
+            return res.status(400).json({ error: 'Book already exists in the database' });
         }
 
-        const author = await Autor.findOne({ where: { nomeAutor: req.body.autorPedidoLivro } });
-        const category = await Categoria.findByPk(req.body.idCategoria);
-
-        const idUtilizador = req.userId; 
-
-        req.body.idPedidoNovoLivro = requestId;
-
-        req.body.idUtilizador = req.body.idUtilizador || idUtilizador;
-        req.body.idTipoUtilizador = req.body.idTipoUtilizador || 1;
-
-        let newRequest = await PedidoNovoLivro.create({
-            nomePedidoLivro: req.body.nomePedidoLivro,
-            anoPedidoLivro: req.body.anoPedidoLivro,
-            descricaoPedidoLivro: req.body.descricaoPedidoLivro,
-            capaLivroPedido: req.body.capaLivroPedido,
-            estadoPedido: 'validating',
-            idPedidoNovoLivro: requestId, 
+        // Create the book request
+        const bookRequest = await db.pedidoNovoLivro.create({
+            nomePedidoLivro: bookData.nomePedidoLivro,
+            anoPedidoLivro: bookData.anoPedidoLivro,
+            descricaoPedidoLivro: bookData.descricaoPedidoLivro,
+            capaLivroPedido: bookData.capaLivroPedido,
+            estadoPedido: bookData.estadoPedido,
+            // Associate with user
             idUtilizador: idUtilizador,
-            Autor: author,
-            Categoria: category
         });
 
-        res.status(201).json({
-            msg: "Book request successfully created.",
-            data: newRequest,
-            links: [
-                { rel: "delete", href: `/requests/${newRequest.idPedidoLivro}`, method: "DELETE" },
-                { rel: "update", href: `/requests/${newRequest.idPedidoLivro}`, method: "PATCH" },
-            ]
-        });
+        // Check if authors already exist or create new ones
+        const authorIds = [];
+        for (const authorName of authorNames) {
+            let author = await db.autor.findOne({ where: { nomeAutor: authorName } });
 
-    } catch (err) {
-        if (err instanceof ValidationError) {
-            res.status(400).json({ msg: err.errors.map(e => e.message) });
-        } else {
-            res.status(500).json({
-                msg: err.message || "Something went wrong. Please try again later."
-            });
+            // If author doesn't exist, calculate the next available ID
+            if (!author) {
+                const authorCount = await db.autor.count();
+                const nextAuthorId = authorCount + 1;
+                author = await db.autor.create({ idAutor: nextAuthorId, nomeAutor: authorName });
+            }
+
+            authorIds.push(author.idAutor);
         }
+
+        // Associate authors with the book request
+        await bookRequest.setAutores(authorIds);
+
+        // Associate categories with the book request
+        await bookRequest.setCategorias(categoryIds);
+
+        // Send success response
+        res.status(201).json({ message: 'Book request created successfully', bookRequest });
+    } catch (error) {
+        // Handle error
+        console.error('Error creating book request:', error);
+        res.status(500).json({ error: 'Failed to create book request' });
     }
 };
 

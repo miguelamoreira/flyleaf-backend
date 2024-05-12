@@ -47,9 +47,5 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
-    pedidoNovoLivro.associate = (models) => {
-        pedidoNovoLivro.belongsTo(models.utilizador, { foreignKey: 'idUtilizador' });
-    };
-
     return pedidoNovoLivro;
 };

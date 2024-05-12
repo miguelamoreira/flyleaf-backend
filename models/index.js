@@ -104,6 +104,9 @@ db.pedidoNovoLivro.belongsToMany(db.categoria, {
 db.utilizador.hasMany(db.listaLeitura, { foreignKey: 'idUtilizador' });
 db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
 
+db.utilizador.hasMany(db.pedidoNovoLivro, { foreignKey: 'idUtilizador' });
+db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
 db.utilizador.belongsToMany(db.livro, { through: 'favoritoutilizador' });
 db.livro.belongsToMany(db.utilizador, { through: 'favoritoutilizador' });
 
@@ -133,9 +136,6 @@ db.criticaLivro.belongsTo(db.utilizador);
 
 db.utilizador.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.utilizador);
-
-db.utilizador.hasMany(db.pedidoNovoLivro, { foreignKey: 'idUtilizador' });
-db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
 
 db.tipoNotificacao.hasMany(db.notificacao);
 db.notificacao.belongsTo(db.tipoNotificacao);
