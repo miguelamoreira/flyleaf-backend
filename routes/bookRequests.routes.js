@@ -9,6 +9,5 @@ router.route('/')
 
 router.route('/:requestId')
     .patch(bookRequestsController.updateRequestState)
-    .delete(bookRequestsController.deleteRequest)
 
 module.exports = router;

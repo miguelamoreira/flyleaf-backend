@@ -88,8 +88,8 @@ exports.updateRequestState = async (req, res) => {
     try {
         let request = await PedidoNovoLivro.findByPk(req.params.requestId, {
             include: [
-                { model: Autor, as: 'autores' }, 
-                { model: Categoria, as: 'categorias', attributes: ['idCategoria', 'nomeCategoria'] }
+                { model: Autor, as: 'autors' }, 
+                { model: Categoria, as: 'categoria', attributes: ['idCategoria', 'nomeCategoria'] }
             ]
         });
 
@@ -113,31 +113,37 @@ exports.updateRequestState = async (req, res) => {
         await request.save();
 
         if (requestedState === 'accepted') {
-            let author = await Autor.findOne({ where: { nomeAutor: request.autores[0].nomeAutor } });
+            let author = await Autor.findOne({ where: { nomeAutor: request.autors[0].nomeAutor } });
 
             if (!author) {
-                author = await Autor.create({ nomeAutor: request.autores[0].nomeAutor });
+                author = await Autor.create({ nomeAutor: request.autors[0].nomeAutor });
             }
 
-            let category = request.categorias[0];
+            let category = request.categoria;
+
             if (!category) {
                 return res.status(400).json({
                     msg: "Category not provided or invalid."
                 });
             }
 
-            console.log('Category:', category.toJSON());
+            // Validate book data before creating
+            if (!request.nomeLivroPedido || !request.anoLivroPedido || !request.descricaoLivroPedido) {
+                return res.status(400).json({
+                    msg: "Book name, year, and description are required."
+                });
+            }
 
             const newBook = await Livro.create({
-                nomeLivro: request.nomePedidoLivro,
-                anoLivro: request.anoPedidoLivro,
-                descricao: request.descricaoPedidoLivro,
+                nomeLivro: request.nomeLivroPedido,
+                anoLivro: request.anoLivroPedido,
+                descricaoLivro: request.descricaoLivroPedido,
                 capaLivro: request.capaLivroPedido
             });
 
             console.log('New Book:', newBook.toJSON()); 
 
-            await newBook.setAutor(author);
+            await newBook.setAutors(author);
 
             await newBook.addCategoria(category);
 
@@ -153,26 +159,6 @@ exports.updateRequestState = async (req, res) => {
         });
     } catch (err) {
         console.error(err); 
-        res.status(500).json({
-            msg: `Something went wrong. Please try again later`
-        });
-    }
-};
-
-exports.deleteRequest = async (req, res) => {
-    try {
-        let result = await PedidoNovoLivro.destroy({ where: { idPedidoLivro: req.params.requestId } });
-        
-        if (result === 1) 
-            return res.status(200).json({
-                msg: `Book request with ID ${req.params.requestId} was successfully deleted!`
-            });
-
-        return res.status(404).json({
-            msg: `Cannot find any book request with ID ${req.params.requestId}.`
-        });
-
-    } catch (err) {
         res.status(500).json({
             msg: `Something went wrong. Please try again later`
         });
