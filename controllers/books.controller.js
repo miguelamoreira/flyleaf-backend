@@ -35,11 +35,15 @@ exports.findAllBooks = async (req, res) => {
             include: [
                 { 
                     model: Autor, 
-                    as: 'autores', 
+                    as: 'autors', 
                     attributes: ['nomeAutor'], 
                     through: { attributes: [] } 
                 }, 
-                { model: Categoria, as: 'categoria', attributes: ['nomeCategoria'] } 
+                { 
+                    model: Categoria, 
+                    as: 'categoria', 
+                    attributes: ['nomeCategoria'] 
+                } 
             ],                      
             raw: true
         });

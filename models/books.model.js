@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: { msg: "Year cannot be empty or null!" }
             }
         },
-        descricao: {
+        descricaoLivro: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {

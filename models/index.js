@@ -150,4 +150,8 @@ db.tipoNotificacao.belongsToMany(db.utilizador, {
     timestamps: false 
 });
 
+db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
+db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
+
 module.exports = db;
