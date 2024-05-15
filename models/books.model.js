@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Livro = sequelize.define("livro", {
+    const Livro = sequelize.define("Livro", {
         idLivro: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
         anoLivro: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: true,
             validate: {
                 notNull: { msg: "Year cannot be empty or null!" }
             }
@@ -28,16 +27,20 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         capaLivro: {
-            type: DataTypes.BLOB,
+            type: DataTypes.BLOB('long'),
             allowNull: false,
             validate: {
                 notNull: { msg: "Cover cannot be empty or null!" }
             }
         }
     }, {
-        tableName: 'livro',
+        tableName: 'Livro',
         timestamps: false
     });
+
+    Livro.associate = (models) => {
+        Livro.hasMany(models.criticaLivro, { foreignKey: 'idCritica' });
+    };
 
     return Livro;
 };

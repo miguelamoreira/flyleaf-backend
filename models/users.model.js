@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Utilizador = sequelize.define("utilizador", {
+    const Utilizador = sequelize.define("Utilizador", {
         idUtilizador: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -44,12 +44,16 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'utilizador',
+        tableName: 'Utilizador',
         timestamps: false
     });
 
     Utilizador.associate = (models) => {
-        Utilizador.belongsTo(models.tipoutilizador, { foreignKey: 'idTipoUtilizador' });
+        Utilizador.belongsTo(models.tipoUtilizador, { foreignKey: 'idTipoUtilizador' });
+        Utilizador.hasMany(models.criticaLivro, { foreignKey: 'idCritica' });
+        Utilizador.hasMany(models.listaLeitura, { foreignKey: 'idLista' });
+        Utilizador.hasMany(models.Notificacao, { foreignKey: 'idNotificacao' });
+        Utilizador.hasMany(models.pedidoNovoLivro, { foreignKey: 'idPedido' });
     };
 
     return Utilizador;

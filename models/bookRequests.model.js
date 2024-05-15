@@ -1,26 +1,25 @@
 module.exports = (sequelize, DataTypes) => {
-    const pedidoNovoLivro = sequelize.define("pedidonovolivro", {
-        idPedidoLivro: {
+    const PedidoNovoLivro = sequelize.define("pedidoNovoLivro", {
+        idPedido: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        nomePedidoLivro: {
+        nomeLivroPedido: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: { msg: "Book request name cannot be empty or null!" }
             }
         },
-        anoPedidoLivro: {
+        anoLivroPedido: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: true,
             validate: {
                 notNull: { msg: "Book request year cannot be empty or null!" }
             }
         },
-        descricaoPedidoLivro: {
+        descricaoLivroPedido: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -43,9 +42,13 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
     }, {
-        tableName: 'pedidonovolivro',
+        tableName: 'pedidoNovoLivro',
         timestamps: false
     });
 
-    return pedidoNovoLivro;
+    PedidoNovoLivro.associate = (models) => {
+        PedidoNovoLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+    };
+
+    return PedidoNovoLivro;
 };

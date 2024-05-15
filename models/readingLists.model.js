@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const listaLeitura = sequelize.define("listaleitura", {
+    const ListaLeitura = sequelize.define("listaLeitura", {
         idLista: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -27,8 +27,13 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'listaleitura',
+        tableName: 'listaLeitura',
         timestamps: false
     });
-    return listaLeitura;
+
+    ListaLeitura.associate = (models) => {
+        ListaLeitura.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+    };
+
+    return ListaLeitura;
 };

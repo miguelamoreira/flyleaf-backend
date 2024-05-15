@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const tipoNotificacao = sequelize.define("tiponotificacao", {
+    const TipoNotificacao = sequelize.define("tipoNotificacao", {
         idTipoNotificacao: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -13,9 +13,14 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     }, {
-        tableName: 'tiponotificacao',
+        tableName: 'tipoNotificacao',
         timestamps: false
     });
 
-    return tipoNotificacao;
+    TipoNotificacao.associate = (models) => {
+        TipoNotificacao.hasMany(models.Notificacao, { foreignKey: 'idNotificacao' });
+    };
+
+
+    return TipoNotificacao;
 };
