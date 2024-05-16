@@ -154,4 +154,11 @@ db.listaLeitura.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
 
 db.pedidoNovoLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador' });
 
+db.notificacao.belongsTo(db.utilizador, {foreignKey: 'idUtilizador'});
+
+db.notificacao.belongsTo(db.tipoNotificacao, {foreignKey: 'idTipoNotificacao'});
+
+db.leitura.belongsTo(db.livro, {foreignKey: 'idLivro'} )
+db.leitura.belongsTo(db.utilizador, {foreignKey: 'idUtilizador'} )
+
 module.exports = db;

@@ -3,7 +3,6 @@ const router = express.Router();
 const notifController = require("../controllers/notifications.controller.js");
 
 router.route('/')
-    .get(notifController.getAllNotifications)
-
+    .get(notifController.findAllNotifications)
 
 module.exports = router;

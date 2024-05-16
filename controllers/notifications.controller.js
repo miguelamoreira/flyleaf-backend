@@ -4,26 +4,17 @@ const Notification=db.notificacao;
 const TypeNotification =db.tipoNotificacao;
 
 // Controller para buscar todas as notificações do utilizador autenticado
-exports.getAllNotifications = async (req, res) => {
+exports.findAllNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.findAll({
-      where: {
-        userId: req.user.id // Supondo que o id do utilizador autenticado esteja disponível em req.user.id
-      },
-      include: [{
-        model: TypeNotification,
-        attributes: ['type']
-      }],
-      attributes: ['notificationId', 'content']
-    });
+    const notifications = await db.notificacao.findAll();
 
     if (notifications.length === 0) {
       return res.status(404).json({ message: "No notifications found." });
     }
 
     return res.status(200).json({
-      notifications,
-      message: "Notifications retrieved successfully"
+      data: notifications,
+      msg: "Notifications retrieved successfully"
     });
   } catch (error) {
     console.error(error);

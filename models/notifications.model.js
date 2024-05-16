@@ -11,6 +11,24 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 notNull: { msg: "Notification content cannot be empty or null!" }
             }
+        },
+        estadoNotificacao: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true 
+        },
+        dataNotificacao: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+            validate: {
+                notNull: { msg: "Date cannot be empty or null!" }
+            }
+        },
+        tituloNotificacao: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: { msg: "Notification title cannot be empty!" }
+            }
         }
     }, {
         tableName: 'Notificacao',

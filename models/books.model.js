@@ -40,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Livro.associate = (models) => {
         Livro.hasMany(models.criticaLivro, { foreignKey: 'idCritica' });
+        Livro.hasMany(models.leitura, { foreignKey: 'idLivro' });
     };
 
     return Livro;

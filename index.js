@@ -19,7 +19,7 @@ app.use('/books', require("./routes/books.routes.js"));
 app.use('/categories', require("./routes/genres.routes.js"))
 app.use('/reading-lists', require("./routes/lists.routes.js"))
 app.use('/requests', require("./routes/bookRequests.routes.js"))
-
+app.use('/readings', require("./routes/readings.routes.js"))
 app.use('/notifications', require("./routes/notifications.routes.js"))
 
 // handle invalid routes

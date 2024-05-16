@@ -5,6 +5,7 @@ const Livro = db.livro;
 const Autor = db.autor;
 const Categoria = db.categoria;
 const Utilizador = db.utilizador;
+const Notificacao = db.notificacao;
 
 exports.findAllRequests = async (req, res) => {
     try {   
@@ -112,6 +113,14 @@ exports.updateRequestState = async (req, res) => {
 
         await request.save();
 
+        const user = request.idUtilizador;
+
+        if (!user) {
+            return res.status(404).json({
+                msg: `Cannot find user with ID ${request.idUtilizador}`
+            });
+        }
+
         if (requestedState === 'accepted') {
             let author = await Autor.findOne({ where: { nomeAutor: request.autors[0].nomeAutor } });
 
@@ -147,9 +156,27 @@ exports.updateRequestState = async (req, res) => {
 
             await newBook.addCategoria(category);
 
+            const newNotification = await Notificacao.create({
+                idUtilizador: user,
+                idTipoNotificacao: 1, 
+                tituloNotificacao: 'Book request accepted',
+                conteudoNotificacao: `The book "${request.nomeLivroPedido}" has been added to the catalogue.`,
+                dataNotificacao: new Date().toISOString().split('T')[0]
+            });
+
             return res.status(200).json({
                 msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}! Book added to database.`,
                 data: newBook
+            });
+        } 
+
+        if (requestedState === "denied") {
+            const newNotification = await Notificacao.create({
+                idUtilizador: user,
+                idTipoNotificacao: 1, 
+                tituloNotificacao: 'Book request denied',
+                conteudoNotificacao: `The book "${request.nomeLivroPedido}" hasn't been added to the catalogue.`,
+                dataNotificacao: new Date().toISOString().split('T')[0]
             });
         }
 

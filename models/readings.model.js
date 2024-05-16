@@ -9,5 +9,9 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    Leitura.associate = (models) => {
+        Leitura.belongsTo(models.livro, { foreignKey: 'idLivro' });
+    };
+
     return Leitura;
 };
