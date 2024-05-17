@@ -66,7 +66,6 @@ exports.createReviewOrReading = async (req, res) => {
             });
 
             return res.status(201).json({
-                reading: reading,
                 review: review, 
                 message: "Review created successfully." 
             });
