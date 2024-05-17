@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Leitura.associate = (models) => {
         Leitura.belongsTo(models.livro, { foreignKey: 'idLivro' });
+        Leitura.hasMany(models.criticaLivro, { foreignKey: 'dataLeitura' });
     };
 
     return Leitura;

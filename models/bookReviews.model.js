@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
+        idLivro: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         comentario: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -18,16 +22,20 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 notNull: { msg: "Rating cannot be empty or null!" }
             }
-        }
+        },
+        dataLeitura: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
     }, {
         tableName: 'criticaLivro',
         timestamps: false
     });
 
     CriticaLivro.associate = (models) => {
-        CriticaLivro.belongsTo(models.Livro, { foreignKey: 'idLivro' });
+        CriticaLivro.belongsTo(models.Livro, { foreignKey: 'idLivro'});
         CriticaLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
-        CriticaLivro.belongsTo(models.leitura, { foreignKey: 'dataLeitura' });
+        CriticaLivro.belongsTo(models.leitura, { foreignKey: 'dataLeitura'});
     };
 
     return CriticaLivro;

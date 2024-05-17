@@ -6,7 +6,7 @@ const Livro = db.livro;
 exports.findAllReadings = async (req, res) => {
   try {
     const readings = await Leitura.findAll({
-      include: Livro // Eager load the Livro model
+      include: Livro 
     });
 
     if (readings.length === 0) {
@@ -15,7 +15,7 @@ exports.findAllReadings = async (req, res) => {
 
     return res.status(200).json({
       data: readings,
-      msg: "Readings retrieved successfully"
+      message: "Readings retrieved successfully"
     });
   } catch (error) {
     console.error(error);
@@ -29,14 +29,15 @@ exports.createReading = async (req, res) => {
     const readingDate = new Date().toISOString().split('T')[0]; 
   
     try {
-      const newReading = await db.leitura.create({
+      const reading = await Leitura.create({
         idUtilizador: idUtilizador,
         idLivro: idLivro,
-        dataLeitura: readingDate
+        dataLeitura: readingDate,
+        Livro: { idLivro: idLivro }
       });
   
       return res.status(201).json({
-        reading: newReading,
+        data: reading,
         message: "Reading created successfully"
       });
     } catch (error) {

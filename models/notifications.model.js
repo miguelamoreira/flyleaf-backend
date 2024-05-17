@@ -12,10 +12,6 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: { msg: "Notification content cannot be empty or null!" }
             }
         },
-        estadoNotificacao: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true 
-        },
         dataNotificacao: {
             type: DataTypes.DATEONLY,
             allowNull: false,
