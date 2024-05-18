@@ -10,10 +10,6 @@ const convertBinaryToBase64 = (binaryData) => {
     return Buffer.from(binaryData).toString('base64');
 };
 
-const convertBinaryToBase64 = (binaryData) => {
-    return Buffer.from(binaryData).toString('base64');
-};
-
 exports.findAllBooks = async (req, res) => {
     const { nomeLivro, anoLivro, autorLivro, categoriaLivro } = req.query;
     
