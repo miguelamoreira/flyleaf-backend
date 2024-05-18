@@ -4,6 +4,10 @@ const Livro = db.livro;
 const Autor = db.autor;
 const Categoria = db.categoria;
 
+const convertBinaryToBase64 = (binaryData) => {
+    return Buffer.from(binaryData).toString('base64');
+};
+
 exports.findAllBooks = async (req, res) => {
     const { nomeLivro, anoLivro, autorLivro, categoriaLivro } = req.query;
     
@@ -48,6 +52,13 @@ exports.findAllBooks = async (req, res) => {
             raw: true
         });
 
+        books = books.map(book => {
+            if (book.capaLivro) {
+                book.capaLivro = convertBinaryToBase64(book.capaLivro);
+            }
+            return book;
+        });
+
         return res.status(200).json({
             msg: "Books retrieved successfully.",
             data: books
@@ -64,6 +75,10 @@ exports.findOne = async (req, res) => {
 
         if (!book) {
             return res.status(404).json({msg: "The requested book was not found."});
+        }
+
+        if (book.capaLivro) {
+            book.capaLivro = convertBinaryToBase64(book.capaLivro);
         }
 
         return res.status(200).json({

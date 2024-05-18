@@ -2,16 +2,30 @@ const db = require("../models/index.js");
 const Leitura = db.leitura;
 const Livro = db.livro;
 
+const convertBinaryToBase64 = (binaryData) => {
+  return Buffer.from(binaryData).toString('base64');
+};
+
 // Retrieve all readings
 exports.findAllReadings = async (req, res) => {
   try {
-    const readings = await Leitura.findAll({
-      include: Livro 
+    const allReadings = await Leitura.findAll({
+      include: [
+        {model: Livro},
+      ] 
     });
 
-    if (readings.length === 0) {
+    if (allReadings.length === 0) {
       return res.status(404).json({ message: "No readings found." });
     }
+
+    const readings = allReadings.map(reading => {
+      const livro = reading.Livro;
+      if (livro && livro.capaLivro) {
+        livro.capaLivro = convertBinaryToBase64(livro.capaLivro);
+      }
+      return reading;
+    });
 
     return res.status(200).json({
       data: readings,

@@ -163,5 +163,6 @@ db.leitura.belongsTo(db.utilizador, {foreignKey: 'idUtilizador'} )
 
 db.criticaLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador'})
 db.criticaLivro.belongsTo(db.leitura, {foreignKey: 'dataLeitura'});
+db.leitura.belongsTo(db.criticaLivro, {foreignKey: 'dataLeitura'});
 
 module.exports = db;

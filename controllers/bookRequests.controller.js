@@ -7,6 +7,10 @@ const Categoria = db.categoria;
 const Utilizador = db.utilizador;
 const Notificacao = db.notificacao;
 
+const convertBinaryToBase64 = (binaryData) => {
+    return Buffer.from(binaryData).toString('base64');
+  };  
+
 exports.findAllRequests = async (req, res) => {
     try {   
         let requests = await PedidoNovoLivro.findAll({
@@ -23,6 +27,13 @@ exports.findAllRequests = async (req, res) => {
                 { rel: 'delete', href: `/requests/${request.idPedido}`, method: 'DELETE'},
                 { rel: 'update', href: `/requests/${request.idPedido}`, method: 'PATCH'},
             ]
+        });
+
+        requests = requests.map(request => {
+            if (request.capaLivroPedido) {
+                request.capaLivroPedido = convertBinaryToBase64(request.capaLivroPedido);
+            }
+            return request;
         });
 
         return res.status(200).json({
