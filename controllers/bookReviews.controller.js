@@ -12,19 +12,22 @@ exports.findAllReviewsByBookId = async (req, res) => {
         const reviews = await CriticaLivro.findAll({
             where: { idLivro: bookId },
             include: [
-                { model: Utilizador, attributes: ['idUtilizador', 'nomeUtilizador'] },
+                { model: Utilizador, attributes: ['idUtilizador', 'nomeUtilizador', 'avatarUtilizador'] },
                 { model: Leitura, attributes: ['dataLeitura'] }
             ]
         });
 
-        if (reviews.length === 0) {
-            return res.status(404).json({ msg: "No reviews were found." });
-        }
+        //if (reviews.length === 0) {
+        //    return res.status(404).json({ msg: "No reviews were found." });
+        //}
 
         const response = reviews.map(review => ({
+            idLivro: review.idLivro,
             idCritica: review.idCritica,
             idLeitura: review.idLeitura,
             idUtilizador: review.idUtilizador,
+            nomeUtilizador: review.Utilizador.nomeUtilizador,
+            avatarUtilizador: review.Utilizador.avatarUtilizador,
             comentario: review.comentario,
             classificao: review.classificacao
         }));

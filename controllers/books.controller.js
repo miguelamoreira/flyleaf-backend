@@ -3,6 +3,12 @@ const db = require("../models/index.js");
 const Livro = db.livro;
 const Autor = db.autor;
 const Categoria = db.categoria;
+const Utilizador = db.utilizador;
+const CriticaLivro = db.criticaLivro;
+
+const convertBinaryToBase64 = (binaryData) => {
+    return Buffer.from(binaryData).toString('base64');
+};
 
 const convertBinaryToBase64 = (binaryData) => {
     return Buffer.from(binaryData).toString('base64');
@@ -40,8 +46,7 @@ exports.findAllBooks = async (req, res) => {
                 { 
                     model: Autor, 
                     as: 'autors', 
-                    attributes: ['nomeAutor'], 
-                    through: { attributes: [] } 
+                    attributes: ['nomeAutor']
                 }, 
                 { 
                     model: Categoria, 
@@ -71,7 +76,20 @@ exports.findAllBooks = async (req, res) => {
 // Retrieve a single book
 exports.findOne = async (req, res) => {
     try {
-        let book = await Livro.findByPk(req.params.bookId);
+        let book = await Livro.findByPk(req.params.bookId, {
+            include: [
+                { 
+                    model: Autor, 
+                    as: 'autors', 
+                    attributes: ['nomeAutor']
+                }, 
+                { 
+                    model: Categoria, 
+                    as: 'categoria', 
+                    attributes: ['nomeCategoria'] 
+                }
+            ]
+        });
 
         if (!book) {
             return res.status(404).json({msg: "The requested book was not found."});
