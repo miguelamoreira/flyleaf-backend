@@ -64,7 +64,7 @@ exports.findAllBooks = async (req, res) => {
             data: books
         });
     } catch (err) {
-        res.status(500).json({msg: err.message || "Something went wrong. Please try again later."});
+        res.status(500).json({msg: "Something went wrong. Please try again later."});
     }
 };
 

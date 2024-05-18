@@ -42,6 +42,14 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 notNull: { msg: "User state cannot be empty or null!" }
             }
+        },
+        avatarUtilizador: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: 'avatar.svg',
+            validate: {
+                notNull: { msg: "User avatar cannot be empty or null!"}
+            }
         }
     }, {
         tableName: 'Utilizador',

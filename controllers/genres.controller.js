@@ -5,11 +5,16 @@ const Categoria = db.categoria;
 exports.findAllGenres = async (req, res) => {
     try {
         const genres = await Categoria.findAll();
-        res.status(200).json({
-            message: "Genres retrieved successfully.",
+
+        if (!genres) {
+            return res.status(404).json({msg: "No book categories were found."})
+        }
+
+        return res.status(200).json({
+            msg: "Genres retrieved successfully.",
             data: genres
         });
     } catch (error) {
-        res.status(500).json({message: "Something went wrong. Please try again later."});
+        res.status(500).json({msg: "Something went wrong. Please try again later."});
     }
 }

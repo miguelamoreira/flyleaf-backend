@@ -11,31 +11,31 @@ exports.login = async (req, res) => {
   
     try {
         if (!emailUtilizador || !passeUtilizador) {
-            return res.status(400).json({ message: 'Please provide email and password' });
+            return res.status(400).json({ msg: 'Please provide email and password' });
         }
       
         const user = await Utilizador.findOne({ where: { emailUtilizador } });
   
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ msg: 'User not found' });
         }
   
         if (user.passeUtilizador !== passeUtilizador) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ msg: 'Invalid credentials' });
         }
 
         const token = jwt.sign({ userId: user.idUtilizador }, 'secret', { expiresIn: '1h' });
     
         res.status(200).json({ token, user: user });
     } catch (error) {
-        res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+        res.status(500).json({ msg: 'Something went wrong. Please try again later.' });
     }
 };
 
 // Display list of all users
 exports.findAll = async (req, res) => {
     try {   
-        let users = await Utilizador.findAll({ raw: true });
+        let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
 
         users.forEach(user => {
             user.links = [
@@ -54,7 +54,7 @@ exports.findAll = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({
-            msg: err.message || "Something went wrong. Please try again later."
+            msg: "Something went wrong. Please try again later."
         })
     }
 };
@@ -62,7 +62,7 @@ exports.findAll = async (req, res) => {
 // Handle user creation
 exports.create = async (req, res) => {
     try {
-        const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } });
+        const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } }, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
         
         if (existingUser) {
             return res.status(400).json({ msg: 'User already registered' });
@@ -85,7 +85,7 @@ exports.create = async (req, res) => {
             res.status(400).json({ msg: err.errors.map(e => e.message) });
         } else {
             res.status(500).json({
-                msg: err.message || "Something went wrong. Please try again later."
+                msg: "Something went wrong. Please try again later."
             });
         }
     }
@@ -185,6 +185,6 @@ exports.update = async (req, res) => {
 
         return res.status(200).json({ msg: `User with ID ${req.params.userId} updated successfully.` });
     } catch (err) {
-        return res.status(500).json({ msg: err.message || "Something went wrong. Please try again later" });
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }
 };

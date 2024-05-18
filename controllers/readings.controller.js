@@ -16,7 +16,7 @@ exports.findAllReadings = async (req, res) => {
     });
 
     if (allReadings.length === 0) {
-      return res.status(404).json({ message: "No readings found." });
+      return res.status(404).json({ msg: "No readings found." });
     }
 
     const readings = allReadings.map(reading => {
@@ -29,11 +29,11 @@ exports.findAllReadings = async (req, res) => {
 
     return res.status(200).json({
       data: readings,
-      message: "Readings retrieved successfully"
+      msg: "Readings retrieved successfully"
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Something went wrong. Please try again later" });
+    return res.status(500).json({ msg: "Something went wrong. Please try again later" });
   }
 };
 
@@ -52,10 +52,10 @@ exports.createReading = async (req, res) => {
   
       return res.status(201).json({
         data: reading,
-        message: "Reading created successfully"
+        msg: "Reading created successfully"
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: "Something went wrong. Please try again later" });
+      return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }
 };

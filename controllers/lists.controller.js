@@ -14,6 +14,10 @@ exports.findAllLists = async (req, res) => {
             include: [Livro] 
         });
 
+        if (!lists) {
+            return res.status(404).json({msg: "No reading lists were found."});
+        }
+
         for (let i = 0; i < lists.length; i++) {
             let livros = lists[i].Livros;
             for (let j = 0; j < livros.length; j++) {
@@ -24,7 +28,7 @@ exports.findAllLists = async (req, res) => {
         }
 
         return res.status(200).json({
-            message: "Lists retrieved successfully.",
+            msg: "Lists retrieved successfully.",
             data: lists
         });
     } catch (error) {

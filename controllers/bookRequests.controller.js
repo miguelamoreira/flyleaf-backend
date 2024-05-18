@@ -38,9 +38,7 @@ exports.findAllRequests = async (req, res) => {
 
         return res.status(200).json({
             data: requests,
-            links: [
-                { rel: 'add-request', href: '/requests', method: 'POST' }
-            ]
+            msg: "Book requests retrieved successfully"
         });
 
     } catch (err) {

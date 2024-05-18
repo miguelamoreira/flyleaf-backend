@@ -13,4 +13,8 @@ router.route('/:bookId/reviews')
     .get(bookReviewController.findAllReviewsByBookId)
     .post(bookReviewController.createReviewOrReading);
 
+router.route('/:bookId/reviews/:reviewId')
+    .patch(bookReviewController.updateReview)
+    .delete(bookReviewController.deleteReview);
+
 module.exports = router;

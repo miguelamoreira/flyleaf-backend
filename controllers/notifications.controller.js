@@ -9,7 +9,7 @@ exports.findAllNotifications = async (req, res) => {
     const notifications = await db.notificacao.findAll();
 
     if (notifications.length === 0) {
-      return res.status(404).json({ message: "No notifications found." });
+      return res.status(404).json({ msg: "No notifications found." });
     }
 
     return res.status(200).json({
@@ -18,7 +18,7 @@ exports.findAllNotifications = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Something went wrong. Please try again later" });
+    return res.status(500).json({ msg: "Something went wrong. Please try again later" });
   }
 };
 
@@ -30,15 +30,15 @@ exports.updateNotificationSettings = async (req, res) => {
     const typeNotification = await TypeNotification.findByPk(typeNotificationId);
 
     if (!typeNotification) {
-      return res.status(404).json({ message: "Notification not found." });
+      return res.status(404).json({ msg: "Notification not found." });
     }
 
     // Atualiza as configurações de notificação do utilizador
     // Aqui você implementaria a lógica para atualizar as configurações de notificação do utilizador
 
-    return res.status(200).json({ message: "Notifications updated successfully." });
+    return res.status(200).json({ msg: "Notifications updated successfully." });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Something went wrong. Please try again later" });
+    return res.status(500).json({ msg: "Something went wrong. Please try again later" });
   }
 };
