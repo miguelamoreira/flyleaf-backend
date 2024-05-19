@@ -1,6 +1,7 @@
 const db = require("../models/index.js");
 const jwt = require('jsonwebtoken');
 const Utilizador = db.utilizador;
+const bcrypt = require("bcryptjs");
 
 //"Op" necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
@@ -19,12 +20,14 @@ exports.login = async (req, res) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
-  
-        if (user.passeUtilizador !== passeUtilizador) {
+
+        const check = bcrypt.compareSync(passeUtilizador.trim(), user.passeUtilizador);
+        
+        if (!check) {
             return res.status(401).json({ msg: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user.idUtilizador }, 'secret', { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user.idUtilizador, role: user.idTipoUtilizador }, 'secret', { expiresIn: '1h' });
     
         res.status(200).json({ token, user: user });
     } catch (error) {
@@ -68,7 +71,16 @@ exports.create = async (req, res) => {
             return res.status(400).json({ msg: 'User already registered' });
         }
 
-        let newUser = await Utilizador.create(req.body);
+        const hashedPassword = bcrypt.hashSync(req.body.passeUtilizador, 10);
+        console.log('Hashed Password:', hashedPassword);
+
+        let newUser = await Utilizador.create({
+            nomeUtilizador: req.body.nomeUtilizador,
+            emailUtilizador: req.body.emailUtilizador,
+            passeUtilizador: hashedPassword,
+            estadoUtilizador: 'normal',
+            avatarUtilizador: 'avatar.svg'
+        });
 
         res.status(201).json({
             msg: "User successfully created.",

@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         passeUtilizador: {
             type: DataTypes.STRING,
+            trim: true,
             allowNull: false,
             validate: {
                 notNull: { msg: "Password cannot be empty or null!" }
