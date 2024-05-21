@@ -21,13 +21,8 @@ exports.verifyToken = (req, res, next) => {
 
         next();
     } catch (err) {
-        if (err.name === 'TokenExpiredError')
-            err = "Your token has expired! Please login again.";
-
-        if (err.name === 'JsonWebTokenError')
-            err = "Malformed JWT! Please login again.";
-
-        return res.status(401).json({ message: err });
+        
+        return res.status(401).json({ message: 'User not authenticated' });
     }
 };
 

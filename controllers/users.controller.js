@@ -68,7 +68,7 @@ exports.create = async (req, res) => {
         const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } }, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
         
         if (existingUser) {
-            return res.status(400).json({ msg: 'User already registered' });
+            return res.status(409).json({ msg: 'User already registered' });
         }
 
         const hashedPassword = bcrypt.hashSync(req.body.passeUtilizador, 10);
