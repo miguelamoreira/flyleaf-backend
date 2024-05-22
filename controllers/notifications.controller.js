@@ -21,24 +21,3 @@ exports.findAllNotifications = async (req, res) => {
     return res.status(500).json({ msg: "Something went wrong. Please try again later" });
   }
 };
-
-// Controller para atualizar as configurações de notificação do utilizador
-exports.updateNotificationSettings = async (req, res) => {
-  const { typeNotificationId } = req.query;
-
-  try {
-    const typeNotification = await TypeNotification.findByPk(typeNotificationId);
-
-    if (!typeNotification) {
-      return res.status(404).json({ msg: "Notification not found." });
-    }
-
-    // Atualiza as configurações de notificação do utilizador
-    // Aqui você implementaria a lógica para atualizar as configurações de notificação do utilizador
-
-    return res.status(200).json({ msg: "Notifications updated successfully." });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ msg: "Something went wrong. Please try again later" });
-  }
-};
