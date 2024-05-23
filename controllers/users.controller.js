@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
 // Display list of all users
 exports.findAll = async (req, res) => {
     try {   
-        let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
+        let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
 
         users.forEach(user => {
             user.links = [
