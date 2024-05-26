@@ -33,8 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     CriticaLivro.associate = (models) => {
-        CriticaLivro.belongsTo(models.Livro, { foreignKey: 'idLivro'});
-        CriticaLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+        CriticaLivro.belongsTo(models.Livro, { foreignKey: 'idLivro'}, );
+        CriticaLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador', onDelete: 'CASCADE'});
         CriticaLivro.belongsTo(models.leitura, { foreignKey: 'dataLeitura'});
     };
 

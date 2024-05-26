@@ -8,7 +8,7 @@ router.route('/login')
     .post(userController.login)
     
 router.route('/')
-    .get(verifyToken, isAdmin, userController.findAll)
+    .get(verifyToken, userController.findAll)
     .post(userController.create);
 
 router.route('/:userId')
@@ -16,5 +16,8 @@ router.route('/:userId')
     .delete(verifyToken, isAdmin, userController.delete)
     .put(userController.update)
     .patch(verifyToken, isAdmin, userController.toggleState)
+
+router.route('/:userId/avatar')
+    .patch(verifyToken, userController.updateAvatar)
 
 module.exports = router;

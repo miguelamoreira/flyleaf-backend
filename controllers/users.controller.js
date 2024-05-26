@@ -200,3 +200,22 @@ exports.update = async (req, res) => {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }
 };
+
+exports.updateAvatar = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                msg: `Cannot find any user with ID ${req.params.userId}`
+            });
+        }
+
+        user.avatarUtilizador = req.body.avatarUtilizador;
+
+        await user.save();
+        return res.status(200).json({ msg: `Avatar updated successfully.` });
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
+    }
+};

@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     PedidoNovoLivro.associate = (models) => {
-        PedidoNovoLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+        PedidoNovoLivro.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador', onDelete: 'CASCADE' });
     };
 
     return PedidoNovoLivro;

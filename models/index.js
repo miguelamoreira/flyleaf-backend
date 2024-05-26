@@ -78,21 +78,23 @@ db.pedidoNovoLivro.belongsToMany(db.autor, {
     through: 'autorPedido', 
     foreignKey: 'idPedido', 
     otherKey: 'idAutor', 
-    timestamps: false
+    timestamps: false,
+    onDelete: 'CASCADE',
 });
 
 db.categoria.belongsToMany(db.pedidoNovoLivro, {
     through: 'categoriaPedido',
     foreignKey: 'idCategoria',
     otherKey: 'idPedido', 
-    timestamps: false
+    timestamps: false,
+    onDelete: 'CASCADE',
 });
 
 db.pedidoNovoLivro.belongsToMany(db.categoria, {
     through: 'categoriaPedido',
     foreignKey: 'idPedido',
     otherKey: 'idCategoria',
-    timestamps: false
+    timestamps: false,
 });
 
 db.utilizador.belongsToMany(db.livro, {
