@@ -20,4 +20,8 @@ router.route('/:userId')
 router.route('/:userId/avatar')
     .patch(verifyToken, userController.updateAvatar)
 
+router.route('/:userId/favourites')
+    .get(userController.findAllFavouritesByUserId)
+    .post(userController.addFavourites)
+
 module.exports = router;

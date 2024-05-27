@@ -1,10 +1,16 @@
 const db = require("../models/index.js");
 const jwt = require('jsonwebtoken');
 const Utilizador = db.utilizador;
+const Livro = db.livro;
+const Autor = db.autor;
 const bcrypt = require("bcryptjs");
 
 //"Op" necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
+
+const convertBinaryToBase64 = (binaryData) => {
+    return Buffer.from(binaryData).toString('base64');
+  };
 
 // Login 
 exports.login = async (req, res) => {
@@ -215,6 +221,58 @@ exports.updateAvatar = async (req, res) => {
 
         await user.save();
         return res.status(200).json({ msg: `Avatar updated successfully.` });
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
+    }
+};
+
+exports.findAllFavouritesByUserId = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const favouriteBooks = await user.getLivros({ include: [{ model: Autor, as: 'autors' }]});
+
+        favouriteBooks.map(book => {
+            if (book.capaLivro) {
+                book.capaLivro = convertBinaryToBase64(book.capaLivro);
+            }
+            return book;
+        });
+
+        return res.status(200).json({ data: favouriteBooks, msg: 'Favourite books retrieved successfully.'  });
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
+    }
+}
+
+exports.addFavourites = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const book = await Livro.findByPk(req.body.idLivro);
+        if (!book) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
+        const favouriteBooks = await user.getLivros();
+        if (favouriteBooks.length >= 4) {
+            return res.status(400).json({ msg: 'A user can only have up to 4 favorite books.' });
+        }
+
+        const isAlreadyFavourite = favouriteBooks.some(favBook => favBook.idLivro === book.idLivro);
+        if (isAlreadyFavourite) {
+            return res.status(400).json({ msg: 'Book is already marked as favourite.' });
+        }
+
+        await user.addLivro(book);
+
+        return res.status(201).json({ msg: 'Book added to favourites successfully.' });
     } catch (error) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }
