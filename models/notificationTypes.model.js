@@ -19,8 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 
     TipoNotificacao.associate = (models) => {
         TipoNotificacao.hasMany(models.Notificacao, { foreignKey: 'idNotificacao' });
+        TipoNotificacao.hasMany(models.configNotifUtilizador, { foreignKey: 'idTipoNotificacao' });
     };
-
-
     return TipoNotificacao;
 };

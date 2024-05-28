@@ -1,7 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
     const ConfigNotifUtilizador = sequelize.define("configNotifUtilizador", {
+        idTipoNotificacao: {
+            type: DataTypes.INTEGER,
+            primaryKey: true
+        },
+        idUtilizador: {
+            type: DataTypes.INTEGER,
+            primaryKey: true
+        },
         estadoNotificacao: {
-            type: DataTypes.STRING,
+            type: DataTypes.BOOLEAN,
             allowNull: false,
             validate: {
                 notNull: { msg: "Notification state cannot be empty or null!" }
@@ -11,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'configNotifUtilizador',
         timestamps: false
     });
+
+    ConfigNotifUtilizador.associate = (models) => {
+        ConfigNotifUtilizador.belongsTo(models.tipoNotificacao, { foreignKey: 'idTipoNotificacao' });
+        ConfigNotifUtilizador.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+    };
 
     return ConfigNotifUtilizador;
 };

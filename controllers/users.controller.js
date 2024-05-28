@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Utilizador = db.utilizador;
 const Livro = db.livro;
 const Autor = db.autor;
+const configNotifUtilizador = db.configNotifUtilizador;
 const bcrypt = require("bcryptjs");
 
 //"Op" necessary for LIKE operator
@@ -90,6 +91,12 @@ exports.create = async (req, res) => {
             passeUtilizador: hashedPassword,
             estadoUtilizador: 'normal',
             avatarUtilizador: 'avatar.svg'
+        });
+
+        await configNotifUtilizador.create({
+            idTipoNotificacao: 1,
+            idUtilizador: newUser.idUtilizador,
+            estadoNotificacao: true
         });
 
         res.status(201).json({
@@ -191,21 +198,25 @@ exports.update = async (req, res) => {
     try {
         const { username, email, password, confirmPassword } = req.body;
 
-        let user = await Utilizador.findByPk(req.params.userId);
-        if (!user) {
-            return res.status(404).json({ msg: `User with ID ${req.params.userId} not found.` });
+        if (!username || !email || !password || !confirmPassword) {
+            return res.status(400).json({ msg: "Please provide some data." });
         }
 
-        user.username = username;
-        user.email = email;
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: `User not found` });
+        }
+
+        user.nomeUtilizador = username;
+        user.emailUtilizador = email;
 
         if (password && confirmPassword && password === confirmPassword) {
-            user.password = password;
+            user.passeUtilizador = bcrypt.hashSync(password, 10);;
         }
 
         await user.save();
 
-        return res.status(200).json({ msg: `User with ID ${req.params.userId} updated successfully.` });
+        return res.status(200).json({ msg: `User data updated successfully` });
     } catch (err) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require("../controllers/users.controller.js");
+const notifController = require("../controllers/notifications.controller.js")
 const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.middleware.js");
 
 // USERS
@@ -24,6 +25,9 @@ router.route('/:userId/favourites')
     .get(verifyToken, userController.findAllFavouritesByUserId)
     .post(verifyToken, userController.addFavourites)
     .delete(verifyToken, userController.deleteFavourite)
-    .put(userController.updateFavourites)
+    .put(verifyToken, userController.updateFavourites)
+
+router.route('/:userId/notifications/settings')
+    .get(verifyToken, notifController.findAllNotifSettingsByUserId)
 
 module.exports = router;

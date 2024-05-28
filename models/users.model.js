@@ -63,6 +63,7 @@ module.exports = (sequelize, DataTypes) => {
         Utilizador.hasMany(models.listaLeitura, { foreignKey: 'idLista' });
         Utilizador.hasMany(models.Notificacao, { foreignKey: 'idNotificacao' });
         Utilizador.hasMany(models.pedidoNovoLivro, { foreignKey: 'idPedido' });
+        Utilizador.hasMany(models.configNotifUtilizador, { foreignKey: 'idUtilizador' });
     };
 
     return Utilizador;
