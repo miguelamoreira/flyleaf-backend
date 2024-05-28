@@ -27,6 +27,10 @@ exports.login = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
+        if (user.estadoUtilizador === 'bloqueado') {
+            return res.status(403).json({ msg: 'User is blocked. Contact support for assistance.' });
+        }
+
         const check = bcrypt.compareSync(passeUtilizador.trim(), user.passeUtilizador);
         
         if (!check) {
@@ -273,6 +277,63 @@ exports.addFavourites = async (req, res) => {
         await user.addLivro(book);
 
         return res.status(201).json({ msg: 'Book added to favourites successfully.' });
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
+    }
+};
+
+exports.deleteFavourite = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const book = await Livro.findByPk(req.body.idLivro);
+        if (!book) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
+        const favouriteBooks = await user.getLivros();
+        const isFavourite = favouriteBooks.some(favBook => favBook.idLivro === book.idLivro);
+        if (!isFavourite) {
+            return res.status(400).json({ msg: 'Book is not marked as favourite.' });
+        }
+
+        await user.removeLivro(book);
+
+        return res.status(200).json({ msg: 'Book removed from favourites successfully.' });
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later" });
+    }
+};
+
+exports.updateFavourites = async (req, res) => {
+    try {
+        let user = await Utilizador.findByPk(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const oldFav = await Livro.findByPk(req.body.oldFav);
+        if (!oldFav) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
+        const newFav = await Livro.findByPk(req.body.newFav);
+        if (!newFav) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
+        const isFavourite = await user.hasLivro(oldFav);
+        if (!isFavourite) {
+            return res.status(400).json({ msg: 'Book to remove is not marked as a favorite.' });
+        }
+
+        await user.removeLivro(oldFav);
+        await user.addLivro(newFav);
+
+        return res.status(200).json({ msg: 'Trade successful. Book removed and new book added to favorites.' });
     } catch (error) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }

@@ -21,7 +21,9 @@ router.route('/:userId/avatar')
     .patch(verifyToken, userController.updateAvatar)
 
 router.route('/:userId/favourites')
-    .get(userController.findAllFavouritesByUserId)
-    .post(userController.addFavourites)
+    .get(verifyToken, userController.findAllFavouritesByUserId)
+    .post(verifyToken, userController.addFavourites)
+    .delete(verifyToken, userController.deleteFavourite)
+    .put(userController.updateFavourites)
 
 module.exports = router;
