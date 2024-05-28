@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
     ConfigNotifUtilizador.associate = (models) => {
         ConfigNotifUtilizador.belongsTo(models.tipoNotificacao, { foreignKey: 'idTipoNotificacao' });
-        ConfigNotifUtilizador.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador' });
+        ConfigNotifUtilizador.belongsTo(models.Utilizador, { foreignKey: 'idUtilizador', onDelete: 'CASCADE' });
     };
 
     return ConfigNotifUtilizador;
