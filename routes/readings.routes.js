@@ -6,6 +6,6 @@ const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.mid
 router.route('/')
     .get(verifyToken, readingsController.findAllReadings)
     .post(verifyToken, readingsController.createReading)
-
+    .delete(verifyToken, readingsController.deleteReading)
 
 module.exports = router;
