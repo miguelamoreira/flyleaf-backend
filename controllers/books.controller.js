@@ -11,27 +11,27 @@ const convertBinaryToBase64 = (binaryData) => {
 };
 
 exports.findAllBooks = async (req, res) => {
-    const { nomeLivro, anoLivro, autorLivro, categoriaLivro } = req.query;
+    const { title, year, author, genre } = req.query;
     
     try {
         let books;
 
         const whereOptions = {};
 
-        if (anoLivro) {
-            whereOptions.anoLivro = anoLivro;
+        if (year) {
+            whereOptions.anoLivro = year;
         }
 
-        if (autorLivro) {
-            whereOptions['$autores.nomeAutor$'] = { [Op.like]: `%${autorLivro}%` };
+        if (author) {
+            whereOptions['$autores.nomeAutor$'] = { [Op.like]: `%${author}%` };
         }        
 
-        if (categoriaLivro) {
-            whereOptions['$categoria.nomeCategoria$'] = { [Op.like]: `%${categoriaLivro}%` };
+        if (genre) {
+            whereOptions['$categoria.nomeCategoria$'] = { [Op.like]: `%${genre}%` };
         }
 
-        if (nomeLivro) {
-            whereOptions.nomeLivro = { [Op.like]: `%${nomeLivro}%` };
+        if (title) {
+            whereOptions.nomeLivro = { [Op.like]: `%${title}%` };
         }
 
         const isEmpty = Object.keys(whereOptions).length === 0;

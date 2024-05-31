@@ -8,6 +8,11 @@ const Utilizador = db.utilizador;
 exports.findAllReviewsByBookId = async (req, res) => {
     const bookId = req.params.bookId;
 
+    let book = await Utilizador.findByPk(bookId);
+    if (!book) {
+        return res.status(404).json({ msg: 'Book not found' });
+    }
+
     try {
         const reviews = await CriticaLivro.findAll({
             where: { idLivro: bookId },
@@ -17,10 +22,6 @@ exports.findAllReviewsByBookId = async (req, res) => {
             ]
         });
 
-        //if (reviews.length === 0) {
-        //    return res.status(404).json({ msg: "No reviews were found." });
-        //}
-
         const response = reviews.map(review => ({
             idLivro: review.idLivro,
             idCritica: review.idCritica,
@@ -29,7 +30,7 @@ exports.findAllReviewsByBookId = async (req, res) => {
             nomeUtilizador: review.Utilizador.nomeUtilizador,
             avatarUtilizador: review.Utilizador.avatarUtilizador,
             comentario: review.comentario,
-            classificao: review.classificacao
+            classificacao: review.classificacao
         }));
 
         res.status(200).json({ data: response, msg: "Reviews retrieved successfully." });
@@ -42,6 +43,11 @@ exports.findAllReviewsByBookId = async (req, res) => {
 exports.createReviewOrReading = async (req, res) => {
     const { idLivro, idUtilizador, comentario, classificacao } = req.body;
 
+    let book = await Utilizador.findByPk(idLivro);
+    if (!book) {
+        return res.status(404).json({ msg: 'Book not found' });
+    }
+
     try {
         if (!comentario && !classificacao) {
             const reading = await Leitura.create({ 
@@ -51,7 +57,7 @@ exports.createReviewOrReading = async (req, res) => {
             });
             return res.status(201).json({ 
                 data: reading, 
-                msg: "Reading instance created successfully." 
+                msg: "Reading entry created successfully." 
             });
         } else {
             const reading = await Leitura.create({ 
@@ -86,6 +92,11 @@ exports.updateReview = async (req, res) => {
     const { comentario, classificacao } = req.body;
 
     try {
+        let book = await Utilizador.findByPk(req.params.bookId);
+        if (!book) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
         const review = await CriticaLivro.findByPk(reviewId);
         if (!review) {
             return res.status(404).json({ msg: "Review not found." });
@@ -106,6 +117,11 @@ exports.deleteReview = async (req, res) => {
     const reviewId = req.params.reviewId;
 
     try {
+        let book = await Utilizador.findByPk(req.params.bookId);
+        if (!book) {
+            return res.status(404).json({ msg: 'Book not found' });
+        }
+
         const review = await CriticaLivro.findByPk(reviewId);
         if (!review) {
             return res.status(404).json({ msg: "Review not found." });

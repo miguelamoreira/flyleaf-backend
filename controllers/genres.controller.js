@@ -11,7 +11,7 @@ exports.findAllGenres = async (req, res) => {
         }
 
         return res.status(200).json({
-            msg: "Genres retrieved successfully.",
+            msg: "Book categories retrieved successfully.",
             data: genres
         });
     } catch (error) {

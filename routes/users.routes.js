@@ -16,6 +16,8 @@ router.route('/:userId')
     .get(userController.findOne)
     .delete(verifyToken, isAdmin, userController.delete)
     .put(userController.update)
+
+router.route('/:userId/state')
     .patch(verifyToken, isAdmin, userController.toggleState)
 
 router.route('/:userId/avatar')
@@ -29,5 +31,6 @@ router.route('/:userId/favourites')
 
 router.route('/:userId/notifications/settings')
     .get(verifyToken, notifController.findAllNotifSettingsByUserId)
+    .patch(verifyToken, notifController.updateNotifications)
 
 module.exports = router;

@@ -6,7 +6,4 @@ const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.mid
 router.route('/')
     .get(verifyToken, notifController.findAllNotifications)
 
-router.route('/settings')
-    .patch(verifyToken, notifController.updateNotifications)
-
 module.exports = router;

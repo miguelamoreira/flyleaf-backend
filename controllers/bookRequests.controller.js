@@ -52,6 +52,10 @@ exports.createRequest = async (req, res) => {
     try {
         const { idUtilizador, bookData, authorNames, categoryIds } = req.body;
 
+        if (!bookData.title || !bookData.year || !bookData.description || !bookData.cover) {
+            return res.status(400).json({ msg: 'The data given is incorrect and/or some parameters are missing.'} )
+        }
+
         const existingBook = await Livro.findOne({
             where: {
                 nomeLivro: bookData.nomePedidoLivro,
@@ -60,15 +64,15 @@ exports.createRequest = async (req, res) => {
         });
 
         if (existingBook) {
-            return res.status(400).json({ error: 'Book already exists in the database' });
+            return res.status(409).json({ msg: 'The suggested book already exists in the catalogue' });
         }
 
         const bookRequest = await PedidoNovoLivro.create({
-            nomeLivroPedido: bookData.nomePedidoLivro,
-            anoLivroPedido: bookData.anoPedidoLivro,
-            descricaoLivroPedido: bookData.descricaoPedidoLivro,
-            capaLivroPedido: bookData.capaLivroPedido,
-            estadoPedido: bookData.estadoPedido,
+            nomeLivroPedido: bookData.title,
+            anoLivroPedido: bookData.year,
+            descricaoLivroPedido: bookData.description,
+            capaLivroPedido: bookData.cover,
+            estadoPedido: bookData.state,
             idUtilizador: idUtilizador,
         });
 
@@ -105,7 +109,7 @@ exports.updateRequestState = async (req, res) => {
 
         if (!request) {
             return res.status(404).json({
-                msg: `Cannot find any book request with ID ${req.params.requestId}`
+                msg: "Book request not found"
             });
         }
 
@@ -114,7 +118,7 @@ exports.updateRequestState = async (req, res) => {
 
         if (!validStates.includes(requestedState)) {
             return res.status(400).json({
-                msg: `Invalid book request state: ${requestedState}`
+                msg: "Invalid book request state"
             });
         }
 
@@ -123,12 +127,6 @@ exports.updateRequestState = async (req, res) => {
         await request.save();
 
         const user = request.idUtilizador;
-
-        if (!user) {
-            return res.status(404).json({
-                msg: `Cannot find user with ID ${request.idUtilizador}`
-            });
-        }
 
         if (requestedState === 'accepted') {
             let author = await Autor.findOne({ where: { nomeAutor: request.autors[0].nomeAutor } });
@@ -144,14 +142,7 @@ exports.updateRequestState = async (req, res) => {
                     msg: "Category not provided or invalid."
                 });
             }
-
-            // Validate book data before creating
-            if (!request.nomeLivroPedido || !request.anoLivroPedido || !request.descricaoLivroPedido) {
-                return res.status(400).json({
-                    msg: "Book name, year, and description are required."
-                });
-            }
-
+            
             const newBook = await Livro.create({
                 nomeLivro: request.nomeLivroPedido,
                 anoLivro: request.anoLivroPedido,
@@ -174,7 +165,7 @@ exports.updateRequestState = async (req, res) => {
             });
 
             return res.status(200).json({
-                msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}! Book added to database.`,
+                msg: `State for book request with ID ${req.params.requestId} successfully updated to ${requestedState}!`,
                 data: newBook
             });
         } 

@@ -48,11 +48,15 @@ exports.findAllNotifSettingsByUserId = async (req, res) => {
 
 exports.updateNotifications = async (req, res) => {
   try {
-    const { idTipoNotificacao, idUtilizador, estadoNotificacao } = req.body;
+    const userId = req.params.userId;
+    const { typeNotifId, state } = req.body;
 
-    if (typeof estadoNotificacao !== 'boolean') {
-      return res.status(400).json({ msg: "estadoNotificacao must be a boolean value." });
+    if (typeof state !== 'boolean') {
+      return res.status(400).json({ msg: "state must be a boolean value." });
     }
+
+    const idTipoNotificacao = typeNotifId;
+    const idUtilizador = userId;
 
     const config = await configNotifUtilizador.findOne({
       where: { idTipoNotificacao, idUtilizador }
@@ -62,7 +66,7 @@ exports.updateNotifications = async (req, res) => {
       return res.status(404).json({ msg: "Configuration not found." });
     }
 
-    config.estadoNotificacao = estadoNotificacao;
+    config.estadoNotificacao = state;
     await config.save();
 
     return res.status(200).json({ msg: "Notification status updated successfully." });

@@ -51,6 +51,10 @@ exports.findAll = async (req, res) => {
     try {   
         let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
 
+        if (!users) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
         users.forEach(user => {
             user.links = [
                 { rel: 'self', href: `/users/${user.id}`, method: 'GET'},
@@ -79,7 +83,15 @@ exports.create = async (req, res) => {
         const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } }, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
         
         if (existingUser) {
-            return res.status(409).json({ msg: 'User already registered' });
+            return res.status(409).json({ msg: 'User already registed' });
+        }
+
+        if (!req.body.nomeUtilizador || !req.body.emailUtilizador || !req.body.passeUtilizador) {
+            return res.status(400).json({ msg: 'Please provide username, password and email'})
+        }
+
+        if (req.body.passeUtilizador != req.body.confirmPassword) {
+            return res.status(400).json({ msg: 'Passwords must match'})
         }
 
         const hashedPassword = bcrypt.hashSync(req.body.passeUtilizador, 10);
@@ -123,11 +135,11 @@ exports.create = async (req, res) => {
 // Retrieve a single user
 exports.findOne = async (req, res) => {
     try {
-        let user = await Utilizador.findByPk(req.params.userId);
+        let user = await Utilizador.findByPk(req.params.userId, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
 
         if (!user) {
             return res.status(404).json({
-                msg: `Cannot find any user with ID ${req.params.userId}`
+                msg: "User not found"
             });
         }
 
@@ -152,13 +164,9 @@ exports.delete = async (req, res) => {
         let result = await Utilizador.destroy({ where: { idUtilizador: req.params.userId } });
         
         if (result === 1) 
-            return res.status(200).json({
-                msg: `User with ID ${req.params.userId} was successfully deleted!`
-            });
+            return res.status(204);
 
-        return res.status(404).json({
-            msg: `Cannot find any user with ID ${req.params.userId}.`
-        });
+        return res.status(404).json({ msg: "User not found" });
 
     } catch (err) {
         res.status(500).json({
@@ -174,8 +182,12 @@ exports.toggleState = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                msg: `Cannot find any user with ID ${req.params.userId}`
+                msg: "User not found"
             });
+        }
+        
+        if (!req.body.estadoUtilizador) {
+            return res.status(400).json({ msg: 'Please provide the new state' });
         }
 
         user.estadoUtilizador = user.estadoUtilizador === 'normal' ? 'bloqueado' : 'normal';
@@ -183,8 +195,7 @@ exports.toggleState = async (req, res) => {
         await user.save();
 
         return res.status(200).json({
-            msg: `EstadoUtilizador for user with ID ${req.params.userId} successfully toggled!`,
-            data: user
+            msg: "User's state updated successfully",
         });
     } catch (err) {
         res.status(500).json({
@@ -228,14 +239,14 @@ exports.updateAvatar = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                msg: `Cannot find any user with ID ${req.params.userId}`
+                msg: "User not found"
             });
         }
 
         user.avatarUtilizador = req.body.avatarUtilizador;
 
         await user.save();
-        return res.status(200).json({ msg: `Avatar updated successfully.` });
+        return res.status(200).json({ msg: `User's avatar updated successfully.` });
     } catch (error) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }
@@ -277,7 +288,7 @@ exports.addFavourites = async (req, res) => {
 
         const favouriteBooks = await user.getLivros();
         if (favouriteBooks.length >= 4) {
-            return res.status(400).json({ msg: 'A user can only have up to 4 favorite books.' });
+            return res.status(400).json({ msg: 'A user can only have up to 4 favourite books.' });
         }
 
         const isAlreadyFavourite = favouriteBooks.some(favBook => favBook.idLivro === book.idLivro);
@@ -326,25 +337,25 @@ exports.updateFavourites = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const oldFav = await Livro.findByPk(req.body.oldFav);
+        const oldFav = await Livro.findByPk(req.body.oldFavId);
         if (!oldFav) {
             return res.status(404).json({ msg: 'Book not found' });
         }
 
-        const newFav = await Livro.findByPk(req.body.newFav);
+        const newFav = await Livro.findByPk(req.body.newFavId);
         if (!newFav) {
             return res.status(404).json({ msg: 'Book not found' });
         }
 
         const isFavourite = await user.hasLivro(oldFav);
         if (!isFavourite) {
-            return res.status(400).json({ msg: 'Book to remove is not marked as a favorite.' });
+            return res.status(400).json({ msg: 'Book to remove is not marked as favorite.' });
         }
 
         await user.removeLivro(oldFav);
         await user.addLivro(newFav);
 
-        return res.status(200).json({ msg: 'Trade successful. Book removed and new book added to favorites.' });
+        return res.status(200).json({ msg: 'Favourite books updated successfully' });
     } catch (error) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later" });
     }

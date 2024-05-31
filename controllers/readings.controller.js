@@ -22,21 +22,21 @@ exports.findAllReadings = async (req, res) => {
             as: 'autors', 
             attributes: ['nomeAutor'],
             through: {
-              attributes: [] // Exclude join table attributes if not needed
+              attributes: [] 
             }
           },
         },
         {
           model: CriticaLivro,
           where: {
-            idLivro: { [Op.col]: 'leitura.idLivro' }, // Match idLivro with Leitura
-            idUtilizador: { [Op.col]: 'leitura.idUtilizador' }, // Match idUtilizador with Leitura
-            dataLeitura: { [Op.col]: 'leitura.dataLeitura' }, // Match dataLeitura with Leitura
+            idLivro: { [Op.col]: 'leitura.idLivro' }, 
+            idUtilizador: { [Op.col]: 'leitura.idUtilizador' }, 
+            dataLeitura: { [Op.col]: 'leitura.dataLeitura' }, 
           },
           on: {
             dataLeitura: Sequelize.col('leitura.dataLeitura')
           },
-          required: false // Allow null values for CriticaLivro to avoid inner join
+          required: false 
         }
       ]
     });
@@ -65,15 +65,19 @@ exports.findAllReadings = async (req, res) => {
 
 // Create a new reading (button "read")
 exports.createReading = async (req, res) => {
-    const { idUtilizador, idLivro } = req.body;
-    const readingDate = new Date().toISOString().split('T')[0]; 
+    const { userId, bookId } = req.body;
+    const date = new Date().toISOString().split('T')[0]; 
+
+    if (!userId || !bookId) {
+      res.status(200).json({ msg: 'The data given is incorrect and/or some parameters are missing.' })
+    }
   
     try {
       const reading = await Leitura.create({
-        idUtilizador: idUtilizador,
-        idLivro: idLivro,
-        dataLeitura: readingDate,
-        Livro: { idLivro: idLivro }
+        idUtilizador: userId,
+        idLivro: bookId,
+        dataLeitura: date,
+        Livro: { idLivro: bookId }
       });
   
       return res.status(201).json({
@@ -88,13 +92,13 @@ exports.createReading = async (req, res) => {
 
 exports.deleteReading = async (req, res) => {
   try {
-    const { idLivro, idUtilizador, dataLeitura } = req.body;
-    const formattedDataLeitura = new Date(dataLeitura).toISOString();
+    const { bookId, userId, date } = req.body;
+    const formattedDataLeitura = new Date(date).toISOString();
 
     const reading = await Leitura.findOne({
       where: { 
-        idLivro: idLivro, 
-        idUtilizador: idUtilizador, 
+        idLivro: bookId, 
+        idUtilizador: userId, 
         dataLeitura: formattedDataLeitura
       }
     });
@@ -104,7 +108,7 @@ exports.deleteReading = async (req, res) => {
     }
 
     const review = await CriticaLivro.findOne({
-      where: { idLivro: idLivro, idUtilizador: idUtilizador, dataLeitura: formattedDataLeitura }
+      where: { idLivro: bookId, idUtilizador: userId, dataLeitura: formattedDataLeitura }
     });
 
     if (review) {
@@ -113,8 +117,8 @@ exports.deleteReading = async (req, res) => {
 
     await Leitura.destroy({
       where: { 
-        idLivro: idLivro, 
-        idUtilizador: idUtilizador, 
+        idLivro: bookId, 
+        idUtilizador: userId, 
         dataLeitura: formattedDataLeitura
       }
     });
