@@ -13,9 +13,9 @@ router.route('/')
     .post(userController.create);
 
 router.route('/:userId')
-    .get(userController.findOne)
+    .get(verifyToken, userController.findOne)
     .delete(verifyToken, isAdmin, userController.delete)
-    .put(userController.update)
+    .put(verifyToken, userController.update)
 
 router.route('/:userId/state')
     .patch(verifyToken, isAdmin, userController.toggleState)

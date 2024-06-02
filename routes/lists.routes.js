@@ -6,4 +6,8 @@ const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.mid
 router.route('/')
     .get(verifyToken, listsController.findAllLists)
 
+router.route('/:readingListId')
+    .get(verifyToken, listsController.findListById)
+    .delete(verifyToken, listsController.deleteList)
+
 module.exports = router;

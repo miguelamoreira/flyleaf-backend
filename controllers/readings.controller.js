@@ -69,7 +69,17 @@ exports.createReading = async (req, res) => {
     const date = new Date().toISOString().split('T')[0]; 
 
     if (!userId || !bookId) {
-      res.status(200).json({ msg: 'The data given is incorrect and/or some parameters are missing.' })
+      res.status(400).json({ msg: 'The data given is incorrect and/or some parameters are missing.' })
+    }
+
+    let user = await Utilizador.findByPk(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    let book = await Livro.findByPk(req.body.bookId);
+    if (!book) {
+      return res.status(404).json({ msg: 'Book not found' });
     }
   
     try {

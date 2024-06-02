@@ -52,7 +52,7 @@ exports.findAll = async (req, res) => {
         let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
 
         if (!users) {
-            return res.status(404).json({ msg: 'User not found' });
+            return res.status(404).json({ msg: 'Users not found' });
         }
 
         users.forEach(user => {
@@ -88,10 +88,6 @@ exports.create = async (req, res) => {
 
         if (!req.body.nomeUtilizador || !req.body.emailUtilizador || !req.body.passeUtilizador) {
             return res.status(400).json({ msg: 'Please provide username, password and email'})
-        }
-
-        if (req.body.passeUtilizador != req.body.confirmPassword) {
-            return res.status(400).json({ msg: 'Passwords must match'})
         }
 
         const hashedPassword = bcrypt.hashSync(req.body.passeUtilizador, 10);
@@ -164,7 +160,7 @@ exports.delete = async (req, res) => {
         let result = await Utilizador.destroy({ where: { idUtilizador: req.params.userId } });
         
         if (result === 1) 
-            return res.status(204);
+            return res.status(204).json({});
 
         return res.status(404).json({ msg: "User not found" });
 

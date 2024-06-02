@@ -129,7 +129,7 @@ exports.deleteReview = async (req, res) => {
 
         await review.destroy();
 
-        return res.status(204).send(); 
+        return res.status(204).json({});
     } catch (error) {
         return res.status(500).json({ msg: "Something went wrong. Please try again later." });
     }
