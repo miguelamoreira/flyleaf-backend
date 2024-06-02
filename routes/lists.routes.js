@@ -5,9 +5,11 @@ const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.mid
 
 router.route('/')
     .get(verifyToken, listsController.findAllLists)
+    .post(verifyToken, listsController.createList)
 
 router.route('/:readingListId')
     .get(verifyToken, listsController.findListById)
     .delete(verifyToken, listsController.deleteList)
+    .patch(verifyToken, listsController.editList)
 
 module.exports = router;

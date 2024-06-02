@@ -89,3 +89,117 @@ exports.deleteList = async (req, res) => {
         return res.status(500).json({ message: "Something went wrong. Please try again later." });
     }
 };
+
+exports.createList = async (req, res) => {
+    try {
+        const { idUtilizador, nomeLista, estadoLista, descricaoLista, livros } = req.body;
+
+        const existingList = await listaLeitura.findOne({
+            where: {
+                idUtilizador,
+                nomeLista
+            }
+        });
+
+        if (existingList) {
+            return res.status(400).json({ msg: "A reading list with the same name already exists for this user." });
+        }
+
+        if (!livros || livros.length === 0) {
+            return res.status(400).json({ msg: "A reading list must have at least one book." });
+        }
+
+        const newList = await listaLeitura.create({ idUtilizador, nomeLista, estadoLista, descricaoLista });
+
+        if (livros.length > 0) {
+            const books = await Livro.findAll({
+                where: { idLivro: { [Op.in]: livros } },
+                include: [Autor]
+            });
+
+            if (books.length > 0) {
+                for (let book of books) {
+                    if (book.capaLivro) {
+                        book.capaLivro = convertBinaryToBase64(book.capaLivro);
+                    }
+                }
+                await newList.addLivros(books);
+            }
+        }
+
+        return res.status(201).json({
+            msg: "Reading list created successfully",
+            data: newList
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Something went wrong. Please try again later." });
+    }
+};
+
+exports.editList = async (req, res) => {
+    try {
+        const readingListId = req.params.readingListId;
+        const { idUtilizador, nomeLista, estadoLista, descricaoLista, livros } = req.body;
+
+        const existingList = await listaLeitura.findOne({
+            where: {
+                idUtilizador,
+                nomeLista,
+                idLista: { [Op.not]: readingListId }
+            }
+        });
+
+        if (existingList) {
+            return res.status(400).json({ msg: "A reading list with the same name already exists for this user." });
+        }
+
+        const list = await listaLeitura.findByPk(readingListId, {
+            include: [ { model: Livro, include: [Autor] } ]
+        });
+
+        if (!list) {
+            return res.status(404).json({ msg: "Reading list not found." });
+        }
+
+        if (!livros || livros.length === 0) {
+            return res.status(400).json({ msg: "A reading list must have at least one book." });
+        }
+
+        list.idUtilizador = idUtilizador || list.idUtilizador;
+        list.nomeLista = nomeLista || list.nomeLista;
+        list.estadoLista = estadoLista || list.estadoLista;
+        list.descricaoLista = descricaoLista || list.descricaoLista;
+
+        await list.save();
+
+        if (livros && livros.length > 0) {
+            const books = await Livro.findAll({
+                where: {
+                    idLivro: {
+                        [Op.in]: livros
+                    }
+                },
+                include: [Autor]
+            });
+
+            if (books.length !== livros.length) {
+                return res.status(400).json({ msg: "One or more books do not exist." });
+            }
+
+            for (let book of books) {
+                if (book.capaLivro) {
+                    book.capaLivro = convertBinaryToBase64(book.capaLivro);
+                }
+            }
+
+            await list.setLivros(books);
+        }
+
+        return res.status(200).json({
+            msg: "Reading list updated successfully",
+            data: list
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Something went wrong. Please try again later." });
+    }
+};
