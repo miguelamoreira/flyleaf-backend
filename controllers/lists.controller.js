@@ -92,12 +92,12 @@ exports.deleteList = async (req, res) => {
 
 exports.createList = async (req, res) => {
     try {
-        const { idUtilizador, nomeLista, estadoLista, descricaoLista, livros } = req.body;
+        const { userId, name, state, description, newBooks } = req.body;
 
         const existingList = await listaLeitura.findOne({
             where: {
-                idUtilizador,
-                nomeLista
+                idUtilizador: userId,
+                nomeLista: name,
             }
         });
 
@@ -105,15 +105,20 @@ exports.createList = async (req, res) => {
             return res.status(400).json({ msg: "A reading list with the same name already exists for this user." });
         }
 
-        if (!livros || livros.length === 0) {
+        if (!newBooks || newBooks.length === 0) {
             return res.status(400).json({ msg: "A reading list must have at least one book." });
         }
 
-        const newList = await listaLeitura.create({ idUtilizador, nomeLista, estadoLista, descricaoLista });
+        const newList = await listaLeitura.create({
+            idUtilizador: userId,
+            nomeLista: name,
+            estadoLista: state,
+            descricaoLista: description
+        });
 
-        if (livros.length > 0) {
+        if (newBooks.length > 0) {
             const books = await Livro.findAll({
-                where: { idLivro: { [Op.in]: livros } },
+                where: { idLivro: { [Op.in]: newBooks } },
                 include: [Autor]
             });
 
@@ -139,12 +144,12 @@ exports.createList = async (req, res) => {
 exports.editList = async (req, res) => {
     try {
         const readingListId = req.params.readingListId;
-        const { idUtilizador, nomeLista, estadoLista, descricaoLista, livros } = req.body;
+        const { userId, name, state, description, newBooks } = req.body;
 
         const existingList = await listaLeitura.findOne({
             where: {
-                idUtilizador,
-                nomeLista,
+                idUtilizador: userId,
+                nomeLista: name,
                 idLista: { [Op.not]: readingListId }
             }
         });
@@ -161,28 +166,28 @@ exports.editList = async (req, res) => {
             return res.status(404).json({ msg: "Reading list not found." });
         }
 
-        if (!livros || livros.length === 0) {
+        if (!newBooks || newBooks.length === 0) {
             return res.status(400).json({ msg: "A reading list must have at least one book." });
         }
 
-        list.idUtilizador = idUtilizador || list.idUtilizador;
-        list.nomeLista = nomeLista || list.nomeLista;
-        list.estadoLista = estadoLista || list.estadoLista;
-        list.descricaoLista = descricaoLista || list.descricaoLista;
+        list.idUtilizador = userId || list.idUtilizador;
+        list.nomeLista = name || list.nomeLista;
+        list.estadoLista = state;
+        list.descricaoLista = description || list.descricaoLista;
 
         await list.save();
 
-        if (livros && livros.length > 0) {
+        if (newBooks && newBooks.length > 0) {
             const books = await Livro.findAll({
                 where: {
                     idLivro: {
-                        [Op.in]: livros
+                        [Op.in]: newBooks
                     }
                 },
                 include: [Autor]
             });
 
-            if (books.length !== livros.length) {
+            if (books.length !== newBooks.length) {
                 return res.status(400).json({ msg: "One or more books do not exist." });
             }
 
