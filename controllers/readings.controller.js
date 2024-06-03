@@ -3,6 +3,7 @@ const Leitura = db.leitura;
 const CriticaLivro = db.criticaLivro;
 const Livro = db.livro;
 const Autor = db.autor;
+const Utilizador = db.utilizador;
 
 const { Op, ValidationError, Sequelize } = require('sequelize');
 
@@ -72,12 +73,12 @@ exports.createReading = async (req, res) => {
       res.status(400).json({ msg: 'The data given is incorrect and/or some parameters are missing.' })
     }
 
-    let user = await Utilizador.findByPk(req.params.userId);
+    let user = await Utilizador.findByPk(userId);
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    let book = await Livro.findByPk(req.body.bookId);
+    let book = await Livro.findByPk(bookId);
     if (!book) {
       return res.status(404).json({ msg: 'Book not found' });
     }
