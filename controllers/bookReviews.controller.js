@@ -103,7 +103,7 @@ exports.updateReview = async (req, res) => {
         }
 
         await review.update({
-            comentario: comentario || review.comentario,
+            comentario: comentario,
             classificacao: classificacao || review.classificacao
         });
 

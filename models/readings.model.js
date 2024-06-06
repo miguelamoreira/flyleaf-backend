@@ -3,6 +3,22 @@ module.exports = (sequelize, DataTypes) => {
         dataLeitura: {
             type: DataTypes.DATE,
             primaryKey: true
+        },
+        idUtilizador: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            references: {
+              model: 'Utilizador',
+              key: 'idUtilizador'
+            }
+        },
+          idLivro: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            references: {
+              model: 'Livro',
+              key: 'idLivro'
+            }
         }
     }, {
         tableName: 'leitura',
