@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
         }
 
         if (user.estadoUtilizador === 'bloqueado') {
-            return res.status(403).json({ msg: 'User is blocked. Contact support for assistance.' });
+            return res.status(403).json({ msg: 'User is blocked.' });
         }
 
         const check = bcrypt.compareSync(passeUtilizador.trim(), user.passeUtilizador);
@@ -40,7 +40,16 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ userId: user.idUtilizador, role: user.idTipoUtilizador }, 'secret', { expiresIn: '1h' });
     
-        res.status(200).json({ token, user: user });
+        const userResponse = {
+            idUtilizador: user.idUtilizador,
+            nomeUtilizador: user.nomeUtilizador,
+            emailUtilizador: user.emailUtilizador,
+            idTipoUtilizador: user.idTipoUtilizador,
+            avatarUtilizador: user.avatarUtilizador,
+            estadoUtilizador: user.estadoUtilizador
+        };
+
+        res.status(200).json({ token, user: userResponse});
     } catch (error) {
         res.status(500).json({ msg: 'Something went wrong. Please try again later.' });
     }
@@ -107,9 +116,18 @@ exports.create = async (req, res) => {
             estadoNotificacao: true
         });
 
+        const userResponse = {
+            idUtilizador: newUser.idUtilizador,
+            nomeUtilizador: newUser.nomeUtilizador,
+            emailUtilizador: newUser.emailUtilizador,
+            idTipoUtilizador: newUser.idTipoUtilizador,
+            avatarUtilizador: newUser.avatarUtilizador,
+            estadoUtilizador: newUser.estadoUtilizador
+        };
+
         res.status(201).json({
             msg: "User successfully created.",
-            data: newUser,
+            data: userResponse,
             links: [
                 { rel: "self", href: `/users/${newUser.idUtilizador}`, method: "GET" },
                 { rel: "delete", href: `/users/${newUser.idUtilizador}`, method: "DELETE" },
@@ -237,6 +255,10 @@ exports.updateAvatar = async (req, res) => {
             return res.status(404).json({
                 msg: "User not found"
             });
+        }
+
+        if (!req.body.avatarUtilizador) {
+            return res.status(400).json({ msg: "Please provide an avatar."})
         }
 
         user.avatarUtilizador = req.body.avatarUtilizador;

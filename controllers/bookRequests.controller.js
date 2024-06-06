@@ -58,8 +58,8 @@ exports.createRequest = async (req, res) => {
 
         const existingBook = await Livro.findOne({
             where: {
-                nomeLivro: bookData.nomePedidoLivro,
-                anoLivro: bookData.anoPedidoLivro
+                nomeLivro: bookData.title,
+                anoLivro: bookData.year
             }
         });
 
