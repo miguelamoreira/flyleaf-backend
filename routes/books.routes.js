@@ -10,6 +10,7 @@ router.route('/')
 
 router.route('/:bookId')
     .get(verifyToken, bookController.findOne)
+    .delete(verifyToken, isAdmin, bookController.deleteBookById)
 
 router.route('/:bookId/reviews')
     .get(verifyToken, bookReviewController.findAllReviewsByBookId)

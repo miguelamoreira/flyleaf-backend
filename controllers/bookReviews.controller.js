@@ -8,7 +8,7 @@ const Utilizador = db.utilizador;
 exports.findAllReviewsByBookId = async (req, res) => {
     const bookId = req.params.bookId;
 
-    let book = await Utilizador.findByPk(bookId);
+    let book = await Livro.findByPk(bookId);
     if (!book) {
         return res.status(404).json({ msg: 'Book not found' });
     }
@@ -43,7 +43,7 @@ exports.findAllReviewsByBookId = async (req, res) => {
 exports.createReviewOrReading = async (req, res) => {
     const { idLivro, idUtilizador, comentario, classificacao } = req.body;
 
-    let book = await Utilizador.findByPk(idLivro);
+    let book = await Livro.findByPk(idLivro);
     if (!book) {
         return res.status(404).json({ msg: 'Book not found' });
     }

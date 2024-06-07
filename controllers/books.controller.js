@@ -104,3 +104,20 @@ exports.findOne = async (req, res) => {
         res.status(500).json({msg: `Something went wrong. Please try again later`});
     }
 };
+
+exports.deleteBookById = async (req, res) => {
+    const { bookId } = req.params;
+
+    try {
+        const book = await Livro.findByPk(bookId);
+
+        if (!book) {
+            return res.status(404).json({ msg: "Book not found" });
+        }
+
+        await book.destroy();
+        return res.status(204).json({});
+    } catch (error) {
+        return res.status(500).json({ msg: "Something went wrong. Please try again later." });
+    }
+};
