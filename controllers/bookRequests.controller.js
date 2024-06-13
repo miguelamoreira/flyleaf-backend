@@ -15,29 +15,58 @@ exports.findAllRequests = async (req, res) => {
     try {   
         let requests = await PedidoNovoLivro.findAll({
             include: [
-                { model: Autor, as: 'autors' },
-                { model: Categoria, as: 'categoria'},
+                { 
+                    model: Autor, 
+                    as: 'autors', 
+                    attributes: ['nomeAutor'],
+                    through: { attributes: [] }
+                }, 
+                { 
+                    model: Categoria, 
+                    as: 'categoria', 
+                    attributes: ['nomeCategoria'],
+                    through: { attributes: [] }
+                },
                 { model: Utilizador, as: 'Utilizador', attributes: ['nomeUtilizador'] }
             ],
             raw: true
-        });
-
-        requests.forEach(request => {
-            request.links = [
-                { rel: 'delete', href: `/requests/${request.idPedido}`, method: 'DELETE'},
-                { rel: 'update', href: `/requests/${request.idPedido}`, method: 'PATCH'},
-            ]
         });
 
         requests = requests.map(request => {
             if (request.capaLivroPedido) {
                 request.capaLivroPedido = convertBinaryToBase64(request.capaLivroPedido);
             }
+
+            request.authors = requests
+                .filter(b => b.idPedido === request.idPedido)
+                .map(b => b['autors.nomeAutor']);
+
+            request.genres = requests
+                .filter(b => b.idPedido === request.idPedido)
+                .map(b => b['categoria.nomeCategoria']);
+
+            request.authors = Array.from(new Set(request.authors));
+            request.genres = Array.from(new Set(request.genres));
+
+            request.links = [
+                { rel: 'update', href: `/requests/${request.idPedido}`, method: 'PATCH'},
+            ]
+            
             return request;
         });
 
+        const requestsIds = new Set();
+        const requestsData = [];
+
+        for (const request of requests) {
+            if (!requestsIds.has(request.idPedido)) {
+                requestsIds.add(request.idPedido);
+                requestsData.push(request);
+            }
+        }
+
         return res.status(200).json({
-            data: requests,
+            data: requestsData,
             msg: "Book requests retrieved successfully"
         });
 

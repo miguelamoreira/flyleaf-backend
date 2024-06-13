@@ -23,8 +23,8 @@ exports.findAllBooks = async (req, res) => {
         }
 
         if (author) {
-            whereOptions['$autores.nomeAutor$'] = { [Op.like]: `%${author}%` };
-        }        
+            whereOptions['$autors.nomeAutor$'] = { [Op.like]: `%${author}%` };
+        }
 
         if (genre) {
             whereOptions['$categoria.nomeCategoria$'] = { [Op.like]: `%${genre}%` };
@@ -42,29 +42,54 @@ exports.findAllBooks = async (req, res) => {
                 { 
                     model: Autor, 
                     as: 'autors', 
-                    attributes: ['nomeAutor']
+                    attributes: ['nomeAutor'],
+                    through: { attributes: [] }
                 }, 
                 { 
                     model: Categoria, 
                     as: 'categoria', 
-                    attributes: ['nomeCategoria'] 
+                    attributes: ['nomeCategoria'],
+                    through: { attributes: [] }
                 } 
-            ],                      
-            raw: true
+            ],
+            raw: true,
         });
 
         books = books.map(book => {
             if (book.capaLivro) {
                 book.capaLivro = convertBinaryToBase64(book.capaLivro);
             }
+            
+            book.authors = books
+                .filter(b => b.idLivro === book.idLivro)
+                .map(b => b['autors.nomeAutor']);
+
+            book.genres = books
+                .filter(b => b.idLivro === book.idLivro)
+                .map(b => b['categoria.nomeCategoria']);
+
+            book.authors = Array.from(new Set(book.authors));
+            book.genres = Array.from(new Set(book.genres));
+
             return book;
         });
 
+        const catalogueIds = new Set();
+        const catalogue = [];
+
+        for (const book of books) {
+            if (!catalogueIds.has(book.idLivro)) {
+                catalogueIds.add(book.idLivro);
+                catalogue.push(book);
+            }
+        }
+
         return res.status(200).json({
             msg: "Books retrieved successfully.",
-            data: books
+            data: catalogue
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({msg: "Something went wrong. Please try again later."});
     }
 };
