@@ -8,6 +8,9 @@ const { verifyToken, isAdmin, isRegularUser } = require("../middlewares/auth.mid
 router.route('/')
     .get(verifyToken, bookController.findAllBooks)
 
+router.route('/highest-rated')
+    .get(bookController.getHighestRatedBook)
+    
 router.route('/:bookId')
     .get(verifyToken, bookController.findOne)
     .delete(verifyToken, isAdmin, bookController.deleteBookById)

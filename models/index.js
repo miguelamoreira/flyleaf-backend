@@ -167,4 +167,7 @@ db.criticaLivro.belongsTo(db.utilizador, { foreignKey: 'idUtilizador'})
 db.criticaLivro.belongsTo(db.leitura, {foreignKey: 'dataLeitura'});
 db.leitura.belongsTo(db.criticaLivro, {foreignKey: 'dataLeitura'});
 
+db.criticaLivro.belongsTo(db.livro, {foreignKey: 'idLivro'});
+db.livro.hasMany(db.criticaLivro, {foreignKey: 'idLivro'});
+
 module.exports = db;

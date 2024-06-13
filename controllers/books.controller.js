@@ -121,3 +121,70 @@ exports.deleteBookById = async (req, res) => {
         return res.status(500).json({ msg: "Something went wrong. Please try again later." });
     }
 };
+
+exports.getHighestRatedBook = async (req, res) => {
+    try {
+        const books = await Livro.findAll({
+            include: [{
+                model: CriticaLivro,
+                attributes: ['classificacao']
+            },
+            { 
+                model: Autor, 
+                as: 'autors', 
+                attributes: ['nomeAutor']
+            }, 
+            { 
+                model: Categoria, 
+                as: 'categoria', 
+                attributes: ['nomeCategoria'] 
+            }]
+        });
+
+        if (!books || books.length === 0) {
+            return res.status(404).json({ msg: 'No books found' });
+        }
+
+        let highestAverageRatingBook = null;
+        let highestAverageRating = 0;
+
+        books.forEach(book => {
+            const reviews = book.criticaLivros; 
+
+            if (reviews && reviews.length > 0) {
+                const totalRating = reviews.reduce((total, review) => {
+                    const rating = parseFloat(review.classificacao);
+                    return isNaN(rating) ? total : total + rating;
+                }, 0);
+
+                let averageRating = totalRating / reviews.length;
+
+                if (averageRating > highestAverageRating) {
+                    highestAverageRating = averageRating;
+                    console.log(highestAverageRating, 'teste');
+                    highestAverageRatingBook = {
+                        title: book.nomeLivro,
+                        cover: convertBinaryToBase64(book.capaLivro),
+                        description: book.descricaoLivro,
+                        year: book.anoLivro,
+                        averageRating: averageRating.toFixed(1),
+                        authors: book.autors.map(author => author.nomeAutor).join(', '),
+                        categories: book.categoria.map(category => category.nomeCategoria),
+                    };
+                }
+            }
+        });
+
+        if (!highestAverageRatingBook) {
+            return res.status(404).json({ msg: 'Highest average rated book not found' });
+        }
+
+        return res.status(200).json({ 
+            msg: 'Highest rated book retrieved successfully',
+            data: highestAverageRatingBook 
+        });
+    } catch (err) {
+        console.error('Error fetching highest rated book:', err);
+        return res.status(500).json({ msg: 'Something went wrong. Please try again later.' });
+    }
+};
