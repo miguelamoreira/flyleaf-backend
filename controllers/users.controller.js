@@ -9,10 +9,6 @@ const bcrypt = require("bcryptjs");
 //"Op" necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
 
-const convertBinaryToBase64 = (binaryData) => {
-    return Buffer.from(binaryData).toString('base64');
-  };
-
 // Login 
 exports.login = async (req, res) => {
     const { emailUtilizador, passeUtilizador } = req.body;
@@ -278,13 +274,6 @@ exports.findAllFavouritesByUserId = async (req, res) => {
         }
 
         const favouriteBooks = await user.getLivros({ include: [{ model: Autor, as: 'autors' }]});
-
-        favouriteBooks.map(book => {
-            if (book.capaLivro) {
-                book.capaLivro = convertBinaryToBase64(book.capaLivro);
-            }
-            return book;
-        });
 
         return res.status(200).json({ data: favouriteBooks, msg: 'Favourite books retrieved successfully.'  });
     } catch (error) {

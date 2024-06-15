@@ -5,10 +5,6 @@ const listaLeitura = db.listaLeitura;
 const Autor = db.autor;
 const Categoria = db.categoria;
 
-const convertBinaryToBase64 = (binaryData) => {
-    return Buffer.from(binaryData).toString('base64');
-};
-
 // Retrieve all lists
 exports.findAllLists = async (req, res) => {
     try {
@@ -20,15 +16,6 @@ exports.findAllLists = async (req, res) => {
 
         if (!lists) {
             return res.status(404).json({msg: "No reading lists were found."});
-        }
-
-        for (let i = 0; i < lists.length; i++) {
-            let livros = lists[i].Livros;
-            for (let j = 0; j < livros.length; j++) {
-                if (livros[j].capaLivro) {
-                    livros[j].capaLivro = convertBinaryToBase64(livros[j].capaLivro);
-                }
-            }
         }
 
         return res.status(200).json({
@@ -53,14 +40,6 @@ exports.findListById = async (req, res) => {
 
         if (!list) {
             return res.status(404).json({ msg: "Reading list not found." });
-        }
-
-        if (list.Livros) {
-            list.Livros.forEach(book => {
-                if (book.capaLivro) {
-                    book.capaLivro = convertBinaryToBase64(book.capaLivro);
-                }
-            });
         }
 
         return res.status(200).json({
@@ -115,22 +94,6 @@ exports.createList = async (req, res) => {
             estadoLista: state,
             descricaoLista: description
         });
-
-        if (newBooks.length > 0) {
-            const books = await Livro.findAll({
-                where: { idLivro: { [Op.in]: newBooks } },
-                include: [Autor]
-            });
-
-            if (books.length > 0) {
-                for (let book of books) {
-                    if (book.capaLivro) {
-                        book.capaLivro = convertBinaryToBase64(book.capaLivro);
-                    }
-                }
-                await newList.addLivros(books);
-            }
-        }
 
         return res.status(201).json({
             msg: "Reading list created successfully",
@@ -189,12 +152,6 @@ exports.editList = async (req, res) => {
 
             if (books.length !== newBooks.length) {
                 return res.status(400).json({ msg: "One or more books do not exist." });
-            }
-
-            for (let book of books) {
-                if (book.capaLivro) {
-                    book.capaLivro = convertBinaryToBase64(book.capaLivro);
-                }
             }
 
             await list.setLivros(books);

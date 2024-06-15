@@ -6,10 +6,7 @@ const Autor = db.autor;
 const Categoria = db.categoria;
 const Utilizador = db.utilizador;
 const Notificacao = db.notificacao;
-
-const convertBinaryToBase64 = (binaryData) => {
-    return Buffer.from(binaryData).toString('base64');
-  };  
+const cloudinary = require("cloudinary").v2;
 
 exports.findAllRequests = async (req, res) => {
     try {   
@@ -33,10 +30,6 @@ exports.findAllRequests = async (req, res) => {
         });
 
         requests = requests.map(request => {
-            if (request.capaLivroPedido) {
-                request.capaLivroPedido = convertBinaryToBase64(request.capaLivroPedido);
-            }
-
             request.authors = requests
                 .filter(b => b.idPedido === request.idPedido)
                 .map(b => b['autors.nomeAutor']);
@@ -80,10 +73,25 @@ exports.findAllRequests = async (req, res) => {
 exports.createRequest = async (req, res) => {
     try {
         const { idUtilizador, bookData, authorNames, categoryIds } = req.body;
+        console.log('req.file:', req.file);
 
-        if (!bookData.title || !bookData.year || !bookData.description || !bookData.cover) {
+        if (!bookData.title || !bookData.year || !bookData.description) {
             return res.status(400).json({ msg: 'The data given is incorrect and/or some parameters are missing.'} )
         }
+
+        if (!req.file) {
+            return res.status(400).json({ msg: 'No file uploaded' });
+        }
+
+        const coverFile = req.file
+
+        const b64 = Buffer.from(coverFile.buffer).toString("base64");
+        let dataURI = "data:" + coverFile.mimetype + ";base64," + b64;
+
+        const uploadResult = await cloudinary.uploader.upload(dataURI, {
+            folder: 'flyleaf', 
+            resource_type: 'auto', 
+        });
 
         const existingBook = await Livro.findOne({
             where: {
@@ -100,7 +108,7 @@ exports.createRequest = async (req, res) => {
             nomeLivroPedido: bookData.title,
             anoLivroPedido: bookData.year,
             descricaoLivroPedido: bookData.description,
-            capaLivroPedido: bookData.cover,
+            capaLivroPedido: uploadResult.url,
             estadoPedido: bookData.state,
             idUtilizador: idUtilizador,
         });

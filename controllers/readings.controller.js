@@ -7,10 +7,6 @@ const Utilizador = db.utilizador;
 
 const { Op, ValidationError, Sequelize } = require('sequelize');
 
-const convertBinaryToBase64 = (binaryData) => {
-  return Buffer.from(binaryData).toString('base64');
-};
-
 // Retrieve all readings
 exports.findAllReadings = async (req, res) => {
   try {
@@ -46,16 +42,8 @@ exports.findAllReadings = async (req, res) => {
       return res.status(404).json({ msg: "No readings found." });
     }
 
-    const readings = allReadings.map(reading => {
-      const livro = reading.Livro;
-      if (livro && livro.capaLivro) {
-        livro.capaLivro = convertBinaryToBase64(livro.capaLivro);
-      }
-      return reading;
-    });
-
     return res.status(200).json({
-      data: readings,
+      data: allReadings,
       msg: "Readings retrieved successfully"
     });
   } catch (error) {

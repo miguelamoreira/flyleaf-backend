@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         capaLivro: {
-            type: DataTypes.BLOB('long'),
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: { msg: "Cover cannot be empty or null!" }

@@ -6,10 +6,6 @@ const Categoria = db.categoria;
 const Utilizador = db.utilizador;
 const CriticaLivro = db.criticaLivro;
 
-const convertBinaryToBase64 = (binaryData) => {
-    return Buffer.from(binaryData).toString('base64');
-};
-
 exports.findAllBooks = async (req, res) => {
     const { title, year, author, genre } = req.query;
     
@@ -56,10 +52,6 @@ exports.findAllBooks = async (req, res) => {
         });
 
         books = books.map(book => {
-            if (book.capaLivro) {
-                book.capaLivro = convertBinaryToBase64(book.capaLivro);
-            }
-            
             book.authors = books
                 .filter(b => b.idLivro === book.idLivro)
                 .map(b => b['autors.nomeAutor']);
@@ -114,10 +106,6 @@ exports.findOne = async (req, res) => {
 
         if (!book) {
             return res.status(404).json({msg: "The requested book was not found."});
-        }
-
-        if (book.capaLivro) {
-            book.capaLivro = convertBinaryToBase64(book.capaLivro);
         }
 
         return res.status(200).json({
@@ -189,7 +177,7 @@ exports.getHighestRatedBook = async (req, res) => {
                     console.log(highestAverageRating, 'teste');
                     highestAverageRatingBook = {
                         title: book.nomeLivro,
-                        cover: convertBinaryToBase64(book.capaLivro),
+                        cover: book.capaLivro,
                         description: book.descricaoLivro,
                         year: book.anoLivro,
                         averageRating: averageRating.toFixed(1),
