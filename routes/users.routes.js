@@ -30,7 +30,10 @@ router.route('/:userId/favourites')
     .put(verifyToken, userController.updateFavourites)
 
 router.route('/:userId/notifications/settings')
-    .get(verifyToken, notifController.findAllNotifSettingsByUserId)
+    .get(notifController.findAllNotifSettingsByUserId)
     .patch(verifyToken, notifController.updateNotifications)
+
+router.route('/:userId/favouriteGenres')
+    .put(verifyToken, notifController.updateFavouriteGenres)
 
 module.exports = router;

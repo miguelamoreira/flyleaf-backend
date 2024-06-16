@@ -42,7 +42,8 @@ exports.login = async (req, res) => {
             emailUtilizador: user.emailUtilizador,
             idTipoUtilizador: user.idTipoUtilizador,
             avatarUtilizador: user.avatarUtilizador,
-            estadoUtilizador: user.estadoUtilizador
+            estadoUtilizador: user.estadoUtilizador,
+            categoriasFavoritas: user.categoriasFavoritas
         };
 
         res.status(200).json({ token, user: userResponse});
@@ -54,7 +55,7 @@ exports.login = async (req, res) => {
 // Display list of all users
 exports.findAll = async (req, res) => {
     try {   
-        let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
+        let users = await Utilizador.findAll({attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador', 'categoriasFavoritas']});
 
         if (!users) {
             return res.status(404).json({ msg: 'Users not found' });
@@ -85,7 +86,7 @@ exports.findAll = async (req, res) => {
 // Handle user creation
 exports.create = async (req, res) => {
     try {
-        const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } }, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador']});
+        const existingUser = await Utilizador.findOne({ where: { emailUtilizador: req.body.emailUtilizador } }, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'categoriasFavoritas']});
         
         if (existingUser) {
             return res.status(409).json({ msg: 'User already registed' });
@@ -110,6 +111,12 @@ exports.create = async (req, res) => {
             idTipoNotificacao: 1,
             idUtilizador: newUser.idUtilizador,
             estadoNotificacao: true
+        });
+
+        await configNotifUtilizador.create({
+            idTipoNotificacao: 2,
+            idUtilizador: newUser.idUtilizador,
+            estadoNotificacao: false
         });
 
         const userResponse = {
@@ -145,7 +152,7 @@ exports.create = async (req, res) => {
 // Retrieve a single user
 exports.findOne = async (req, res) => {
     try {
-        let user = await Utilizador.findByPk(req.params.userId, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador']});
+        let user = await Utilizador.findByPk(req.params.userId, {attributes: ['idUtilizador', 'nomeUtilizador', 'emailUtilizador', 'estadoUtilizador', 'avatarUtilizador', 'idTipoUtilizador', 'categoriasFavoritas']});
 
         if (!user) {
             return res.status(404).json({

@@ -1,5 +1,5 @@
 const db = require("../models/index.js");
-const { ValidationError } = require('sequelize');
+const { Op, ValidationError } = require('sequelize');
 const PedidoNovoLivro = db.pedidoNovoLivro;
 const Livro = db.livro;
 const Autor = db.autor;
@@ -172,11 +172,11 @@ exports.updateRequestState = async (req, res) => {
                 author = await Autor.create({ nomeAutor: request.autors[0].nomeAutor });
             }
 
-            let category = request.categoria;
+            let categories = request.categoria;
 
-            if (!category) {
+            if (!categories || categories.length === 0) {
                 return res.status(400).json({
-                    msg: "Category not provided or invalid."
+                    msg: "Categories not provided or invalid."
                 });
             }
             
@@ -191,7 +191,36 @@ exports.updateRequestState = async (req, res) => {
 
             await newBook.setAutors(author);
 
-            await newBook.addCategoria(category);
+            for (const category of categories) {
+                await newBook.addCategoria(category);
+            }
+
+            const categoryNames = categories.map(category => category.nomeCategoria);
+
+            const usersWithFavouriteCategories = await Utilizador.findAll({
+                where: {
+                    idUtilizador: {
+                        [Op.ne]: request.idUtilizador, 
+                    },
+                    [Op.or]: categoryNames.map(categoryName => ({
+                        categoriasFavoritas: {
+                            [Op.like]: `%${categoryName}%`
+                        }
+                    }))
+                }
+            });
+
+            console.log('Users with favourite categories:', usersWithFavouriteCategories);
+
+            for (const user of usersWithFavouriteCategories) {
+                await Notificacao.create({
+                    idUtilizador: user.idUtilizador,
+                    idTipoNotificacao: 2,
+                    tituloNotificacao: 'New Book Notification',
+                    conteudoNotificacao: `The book "${request.nomeLivroPedido}" has been added in one of your favourite categories.`,
+                    dataNotificacao: new Date().toISOString().split('T')[0]
+                });
+            }
 
             const newNotification = await Notificacao.create({
                 idUtilizador: user,

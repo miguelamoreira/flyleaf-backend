@@ -34,7 +34,7 @@ exports.findAllNotifSettingsByUserId = async (req, res) => {
       });
     }
 
-    const config = await configNotifUtilizador.findOne({ where: { idUtilizador: user.idUtilizador } });
+    const config = await configNotifUtilizador.findAll({ where: { idUtilizador: user.idUtilizador } });
 
     if (!config) {
       return res.status(404).json({ msg: "Notification settings not found." });
@@ -73,5 +73,50 @@ exports.updateNotifications = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "Something went wrong. Please try again later." });
+  }
+};
+
+exports.updateFavouriteGenres = async (req, res) => {
+  try {
+    const { genres, state } = req.body;
+
+    const user = await Utilizador.findByPk(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const config = await configNotifUtilizador.findOne({
+      where: { idTipoNotificacao: 2, idUtilizador: user.idUtilizador }
+    });
+
+    if (!config) {
+      return res.status(404).json({ msg: "Notification configuration not found" });
+    }
+
+    config.estadoNotificacao = state;
+    config.save();
+
+    if (state) {
+      let currentFavouriteGenres = user.categoriasFavoritas ? user.categoriasFavoritas.split(', ') : [];
+
+      if (JSON.stringify(currentFavouriteGenres.sort()) !== JSON.stringify(genres.sort())) {
+        user.categoriasFavoritas = genres.join(', ');
+      }
+    } else {
+      user.categoriasFavoritas = null;
+    }
+    user.save();
+
+    const updatedConfig = await configNotifUtilizador.findOne({
+      where: { idTipoNotificacao: 2, idUtilizador: user.idUtilizador }
+    });
+
+    return res.status(200).json({ 
+      msg: "Notification state and favourite genres updated successfully.", 
+      data: { updatedConfig, favouriteGenres: user.categoriasFavoritas } 
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "Something went wrong. Please try again later" });
   }
 };
