@@ -117,7 +117,7 @@ exports.deleteReview = async (req, res) => {
     const reviewId = req.params.reviewId;
 
     try {
-        let book = await Utilizador.findByPk(req.params.bookId);
+        let book = await Livro.findByPk(req.params.bookId);
         if (!book) {
             return res.status(404).json({ msg: 'Book not found' });
         }
