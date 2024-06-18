@@ -61,13 +61,14 @@ exports.findAll = async (req, res) => {
             return res.status(404).json({ msg: 'Users not found' });
         }
 
-        users.forEach(user => {
-            user.links = [
-                { rel: 'self', href: `/users/${user.id}`, method: 'GET'},
-                { rel: 'delete', href: `/users/${user.id}`, method: 'DELETE'},
-                { rel: 'modify', href: `/users/${user.id}`, method: 'PUT'},
+        users = users.map(user => ({
+            ...user.toJSON(), 
+            links: [
+                { rel: 'self', href: `/users/${user.idUtilizador}`, method: 'GET' },
+                { rel: 'delete', href: `/users/${user.idUtilizador}`, method: 'DELETE' },
+                { rel: 'modify', href: `/users/${user.idUtilizador}`, method: 'PUT' },
             ]
-        })
+        }));
 
         return res.status(200).json({
             data: users,
