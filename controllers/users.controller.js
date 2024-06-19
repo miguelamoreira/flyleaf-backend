@@ -72,9 +72,6 @@ exports.findAll = async (req, res) => {
 
         return res.status(200).json({
             data: users,
-            links: [
-                { rel: 'add-user', href: '/users', method: 'POST' }
-            ]
         })
 
     } catch (err) {
