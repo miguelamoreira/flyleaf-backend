@@ -33,7 +33,7 @@ router.route('/:userId/notifications/settings')
     .get(notifController.findAllNotifSettingsByUserId)
     .patch(verifyToken, notifController.updateNotifications)
 
-router.route('/:userId/favouriteGenres')
+router.route('/:userId/favourite-genres')
     .put(verifyToken, notifController.updateFavouriteGenres)
 
 module.exports = router;
