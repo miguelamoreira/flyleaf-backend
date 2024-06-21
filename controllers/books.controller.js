@@ -174,7 +174,6 @@ exports.getHighestRatedBook = async (req, res) => {
 
                 if (averageRating > highestAverageRating) {
                     highestAverageRating = averageRating;
-                    console.log(highestAverageRating, 'teste');
                     highestAverageRatingBook = {
                         title: book.nomeLivro,
                         cover: book.capaLivro,
