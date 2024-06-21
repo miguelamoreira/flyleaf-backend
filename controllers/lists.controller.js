@@ -95,11 +95,14 @@ exports.createList = async (req, res) => {
             descricaoLista: description
         });
 
+        await newList.addLivros(newBooks);
+
         return res.status(201).json({
             msg: "Reading list created successfully",
             data: newList
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: "Something went wrong. Please try again later." });
     }
 };
