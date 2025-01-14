@@ -34,21 +34,17 @@
 
 Flyleaf is a web-based application designed to facilitate the monitoring and organization of reading activities. It offers two distinct user roles: administrator and standard user, each with specific functionalities. Authentication is required to access any feature.
 
-<br>
+### Key Features
 
-<b>Key Features</b><br>
-Administrator: <br>
-<ul>
-  <li>Catalog Management: Validate user-submitted book suggestions, add valid books to the catalog, and remove books.</li>
-  <li>User Management: Block or delete user accounts to enforce application rules. </li>
-</ul>
-Standard User: <br>
-<ul>
-  <li>Reading Management: Register books as read, rate them (1–5), and leave reviews. Access a chronological reading history. </li>
-  <li>Catalog Interaction: Browse the catalog and submit suggestions with book details (title, author, genre, year, description, and cover image).</li>
-  <li>Reading Lists: Create and curate custom reading lists using books from the catalog, with full edit capabilities.</li>
-  <li>Profile Management: Personalize profiles with up to four favorite books, control visibility (public/private), and manage notification preferences (suggestion results, reading list activity).</li>
-</ul>
+#### Administrator:
+- **Catalog Management**: Validate user-submitted book suggestions, add valid books to the catalog, and remove books.
+- **User Management**: Block or delete user accounts to enforce application rules.
+
+#### Standard User:
+- **Reading Management**: Register books as read, rate them (1–5), and leave reviews. Access a chronological reading history.
+- **Catalog Interaction**: Browse the catalog and submit suggestions with book details (title, author, genre, year, description, and cover image).
+- **Reading Lists**: Create and curate custom reading lists using books from the catalog, with full edit capabilities.
+- **Profile Management**: Personalize profiles with up to four favorite books, control visibility (public/private), and manage notification preferences (suggestion results, reading list activity).
 
 <hr>
 
